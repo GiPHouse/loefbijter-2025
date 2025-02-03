@@ -1,0 +1,40 @@
+name: Django Tests CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: default
+    env:
+      DJANGO_SECRET_KEY: django-insecure-loefbijter
+      DJANGO_DATABASE_URL: sqlite:///db.sqlite
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Prepare the database
+        run: |
+          uv run manage.py makemigrations
+          uv run manage.py migrate
+
+      - name: Run the tests
+        run: uv run manage.py test
