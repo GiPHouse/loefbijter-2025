@@ -77,7 +77,9 @@ class LoefbijterGroup(TimeStampedModel):
         Permission, verbose_name=_("Permissions"), blank=True
     )
     date_foundation = models.DateField(_("Date of foundation"))
-    date_discontinuation = models.DateField(_("Date of discontinuation"), null=True)
+    date_discontinuation = models.DateField(
+        _("Date of discontinuation"), blank=True, null=True
+    )
     active = models.GeneratedField(  # TODO needs testing
         expression=Case(
             When(
