@@ -3,6 +3,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import CheckConstraint, Q, F
 from django.utils.translation import gettext_lazy as _
 
 
@@ -21,8 +22,6 @@ class Reservation(models.Model):
     A boat reservation can be linked to a training (or event). If it is not then it must
     be reserved by a person with the required skipper's certificate. If the boat has an
     engine, then the user can set an amount of engine-hours used.
-
-    TODO Write validation logic for overlap.
 
     Attributes
     ----------
@@ -47,6 +46,24 @@ class Reservation(models.Model):
 
     class Meta:
         indexes = (models.Index(fields=["content_type", "item_id"]),)
+        constraints = [
+            # TODO
+            # CheckConstraint(
+            #     check=(),
+            #     name="permission",
+            #     violation_error_message="",
+            # ),
+            CheckConstraint(
+                condition=Q(end__gt=F("start")),
+                name="end_gt_start",
+                violation_error_message="",
+            ),
+            CheckConstraint(
+                condition=Q(start__gte=F("end")),
+                name="start_gte_end",
+                violation_error_message="",
+            ),
+        ]
 
     def __str__(self) -> str:
         return f"Reservation for {self.item}"
