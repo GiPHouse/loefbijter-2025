@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
+from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
@@ -58,12 +59,26 @@ class Reservation(models.Model):
                 name="end_gt_start",
                 violation_error_message="End time cannot be before the start time.",
             ),
-            CheckConstraint(
-                condition=Q(start__gte=F("end")),
-                name="start_gte_end",
-                violation_error_message="This item has already been reserved during this timeslot.",  # noqa: E501
-            ),
         )
 
     def __str__(self) -> str:
         return f"Reservation for {self.item}"
+
+    def clean(self):
+        """Check whether any of the other reservations overlap.
+
+        Raises
+        ------
+            ValidationError: This item has already been reserved during this timeslot.
+        """
+        try:
+            Reservation.objects.get(
+                Q(start__range=(self.start, self.end))
+                | Q(end__range=(self.start, self.end))
+                | Q(start__lt=self.start, end__gt=self.end)
+            )
+            raise ValidationError(
+                "This item has already been reserved during this timeslot."
+            )
+        except Reservation.DoesNotExist:
+            return
