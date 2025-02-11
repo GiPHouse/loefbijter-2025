@@ -3,7 +3,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import CheckConstraint, Q, F
+from django.db.models import CheckConstraint, F, Q
 from django.utils.translation import gettext_lazy as _
 
 
@@ -46,24 +46,24 @@ class Reservation(models.Model):
 
     class Meta:
         indexes = (models.Index(fields=["content_type", "item_id"]),)
-        constraints = [
-            # TODO
+        constraints = (
+            # TODO Check for permissions of the reservator, depends on the implementation of permissions.  # noqa: E501
             # CheckConstraint(
             #     check=(),
             #     name="permission",
-            #     violation_error_message="",
+            #     violation_error_message="You are not permitted to make this reservation.",  # noqa: E501
             # ),
             CheckConstraint(
                 condition=Q(end__gt=F("start")),
                 name="end_gt_start",
-                violation_error_message="",
+                violation_error_message="End time cannot be before the start time.",
             ),
             CheckConstraint(
                 condition=Q(start__gte=F("end")),
                 name="start_gte_end",
-                violation_error_message="",
+                violation_error_message="This item has already been reserved during this timeslot.",  # noqa: E501
             ),
-        ]
+        )
 
     def __str__(self) -> str:
         return f"Reservation for {self.item}"
