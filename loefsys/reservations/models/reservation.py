@@ -73,9 +73,11 @@ class Reservation(models.Model):
         """
         try:
             Reservation.objects.get(
-                Q(start__range=(self.start, self.end))
+                Q(content_type=self.content_type)
+                & Q(item_id=self.item_id)
+                & (Q(start__range=(self.start, self.end))
                 | Q(end__range=(self.start, self.end))
-                | Q(start__lt=self.start, end__gt=self.end)
+                | Q(start__lt=self.start, end__gt=self.end))
             )
             raise ValidationError(
                 "This item has already been reserved during this timeslot."
