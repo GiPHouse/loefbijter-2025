@@ -6,7 +6,7 @@ from django.db.models.functions import Now
 from .models import Board, Committee, Fraternity, Taskforce, YearClub
 
 
-class GroupActiveFilter(admin.SimpleListFilter):
+class GroupActivityFilter(admin.SimpleListFilter):
     """Describes a filter that filters a queryset by a group's activity."""
 
     title = "Activity"
@@ -29,7 +29,7 @@ class BoardAdmin(admin.ModelAdmin):
     """Admin interface for the board model."""
 
     list_display = ("name", "year")
-    list_filter = (GroupActiveFilter,)
+    list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description", "year")
 
 
@@ -38,7 +38,7 @@ class CommitteeAdmin(admin.ModelAdmin):
     """Admin interface for the committee model."""
 
     list_display = ("name", "description")
-    list_filter = ("mandatory", GroupActiveFilter)
+    list_filter = ("mandatory", GroupActivityFilter)
     search_fields = ("name", "description")
 
 
@@ -47,7 +47,7 @@ class FraternityAdmin(admin.ModelAdmin):
     """Admin interface for the fraternity model."""
 
     list_display = ("name", "gender_requirement")
-    list_filter = (GroupActiveFilter,)
+    list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description")
 
 
@@ -56,7 +56,7 @@ class TaskforceAdmin(admin.ModelAdmin):
     """Admin interface for the taskforce model."""
 
     list_display = ("name", "description", "requires_nda")
-    list_filter = (GroupActiveFilter, "requires_nda")
+    list_filter = (GroupActivityFilter, "requires_nda")
     search_fields = ("name", "description")
 
 
@@ -65,5 +65,5 @@ class YearClubAdmin(admin.ModelAdmin):
     """Admin interface for the year club model."""
 
     list_display = ("name", "year")
-    list_filter = (GroupActiveFilter,)
+    list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description")
