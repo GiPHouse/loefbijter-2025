@@ -1,3 +1,6 @@
+import datetime
+
+from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.forms import ValidationError
 from django.test import TestCase
@@ -10,9 +13,6 @@ from loefsys.reservations.models import (
     Reservation,
     Room,
 )
-from django.contrib.contenttypes.models import ContentType
-import datetime
-
 from loefsys.reservations.models.choices import ReservableCategories
 
 
