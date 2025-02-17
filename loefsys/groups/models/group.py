@@ -2,8 +2,7 @@
 
 from django.contrib.auth.models import Permission
 from django.db import models
-from django.db.models import Case, Q, QuerySet, When
-from django.db.models.functions import Now
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
@@ -79,17 +78,6 @@ class LoefbijterGroup(TimeStampedModel):
     date_foundation = models.DateField(_("Date of foundation"))
     date_discontinuation = models.DateField(
         _("Date of discontinuation"), blank=True, null=True
-    )
-    active = models.GeneratedField(  # TODO needs testing
-        expression=Case(
-            When(
-                date_discontinuation__isnull=False,
-                then=Q(date_discontinuation__gte=Now()),
-            ),
-            default=True,
-        ),
-        output_field=models.BooleanField(),
-        db_persist=True,
     )
     display_members = models.BooleanField(_("Display group members"))
 
