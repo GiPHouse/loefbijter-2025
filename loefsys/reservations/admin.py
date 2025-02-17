@@ -1,11 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin  # noqa: D100
 
-from .models import Reservation, ReservableType, Boat, Material, Room
+from .models import Boat, Material, ReservableType, Reservation, Room
 
 
-@admin.register(Reservation, ReservableType, Boat, Material, Room)
-class ReservationsAdmin(admin.ModelAdmin):
-    pass
+@admin.register(Boat, Material, Room, ReservableType, Reservation)
+class ReservationAdmin(admin.ModelAdmin):
+    """Admin interface for the boat, material, room, reservabletype and reservation."""
 
 
 # TODO Change `item id` such that an object can be selected.
