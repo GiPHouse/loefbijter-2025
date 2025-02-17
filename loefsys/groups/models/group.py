@@ -3,6 +3,7 @@
 from django.contrib.auth.models import Permission
 from django.db import models
 from django.db.models import QuerySet
+from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
@@ -31,7 +32,7 @@ class GroupManager[TGroup: "LoefbijterGroup"](models.Manager[TGroup]):
             A query of filtered :class:`~loefsys.groups.models.group.LoefbijterGroup`
             implementations.
         """
-        return self.filter(active=True)
+        return self.filter(date_discontinuation__gte=Now())
 
 
 class LoefbijterGroup(TimeStampedModel):
