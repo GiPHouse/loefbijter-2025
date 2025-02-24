@@ -18,6 +18,10 @@ class Fraternity(LoefbijterGroup):
         The type of fraternity.
     """
 
+    class Meta:
+        # Change the plural name from standard "fraternitys"
+        verbose_name_plural = "fraternities"
+
     gender_requirement = models.PositiveSmallIntegerField(
         choices=FraternityGenders, default=FraternityGenders.MIXED
     )
