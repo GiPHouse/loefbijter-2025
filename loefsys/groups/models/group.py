@@ -3,6 +3,7 @@
 from django.contrib.auth.models import Permission
 from django.db import models
 from django.db.models import CheckConstraint, Q
+from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
@@ -20,18 +21,6 @@ class GroupManager[TGroup: "LoefbijterGroup"](models.Manager[TGroup]):
     def get_by_natural_key(self, name):
         """Get an instance by its natural key."""
         return self.get(name=name)
-
-    #TODO This can probably be removed as it is now a property.
-    # def active(self) -> QuerySet[TGroup]
-    #     """Filter and return only groups that are active.
-
-    #     Returns
-    #     -------
-    #     ~django.db.models.query.QuerySet of ~loefsys.groups.models.group.LoefbijterGroup  # noqa: E501
-    #         A query of filtered :class:`~loefsys.groups.models.group.LoefbijterGroup`
-    #         implementations.
-    #     """
-    #     return self.filter(date_discontinuation__gte=Now())
 
 
 class LoefbijterGroup(TimeStampedModel):
@@ -59,13 +48,17 @@ class LoefbijterGroup(TimeStampedModel):
         The date that the group was founded on.
     date_discontinuation : ~datetime.date, None
         The date that the group ceased to exist.
-    active : bool #TODO This is outdated as it is now a property.
-        A flag whether the group is currently active.
-
-        It is a property calculated by whether :attr:`.date_discontinuation` exists and
-        whether the date has passed.
+        Cannot be before date_foundation.
     display_members : bool
         A flag that determines whether the members of the group are publicly visible.
+
+    Properties
+    ----------
+    active :
+        A property that returns whether the group is currently active.
+
+        It is calculated by whether :attr:`.date_discontinuation` exists and whether
+        the date has passed.
     """
 
     name = models.CharField(_("Name"), max_length=150, unique=True)
@@ -83,8 +76,16 @@ class LoefbijterGroup(TimeStampedModel):
             CheckConstraint(
                 name="date_discontinuation_gte_date_foundation",
                 condition=Q(date_discontinuation__gte=models.F("date_foundation")),
+                violation_error_message=_(
+                    "The date of discontinuation can't be before the date of foundation"
+                ),
             ),
         )
+
+    @property
+    def active(self):
+        """Return whether the group is currently active."""
+        return Q(date_discontinuation=None) or Q(date_discontinuation__gte=Now())
 
     display_members = models.BooleanField(_("Display group members"))
 

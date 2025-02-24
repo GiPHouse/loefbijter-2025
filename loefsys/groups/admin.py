@@ -19,7 +19,10 @@ class GroupActivityFilter(admin.SimpleListFilter):
     def queryset(self, _request, queryset):
         """Return the filtered queryset."""
         if self.value() == "active":
-            return queryset.filter(date_discontinuation__gte=Now())
+            return (
+                queryset.filter(date_discontinuation = None) or
+                queryset.filter(date_discontinuation__gte=Now())
+                )
         if self.value() == "inactive":
             return queryset.filter(date_discontinuation__lt=Now())
 
@@ -31,6 +34,7 @@ class BoardAdmin(admin.ModelAdmin):
     list_display = ("name", "year")
     list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description", "year")
+    filter_horizontal = ("permissions",)
 
 
 @admin.register(Committee)
@@ -40,6 +44,7 @@ class CommitteeAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
     list_filter = ("mandatory", GroupActivityFilter)
     search_fields = ("name", "description")
+    filter_horizontal = ("permissions",)
 
 
 @admin.register(Fraternity)
@@ -49,6 +54,7 @@ class FraternityAdmin(admin.ModelAdmin):
     list_display = ("name", "gender_requirement")
     list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description")
+    filter_horizontal = ("permissions",)
 
 
 @admin.register(Taskforce)
@@ -58,6 +64,7 @@ class TaskforceAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "requires_nda")
     list_filter = (GroupActivityFilter, "requires_nda")
     search_fields = ("name", "description")
+    filter_horizontal = ("permissions",)
 
 
 @admin.register(YearClub)
@@ -67,3 +74,4 @@ class YearClubAdmin(admin.ModelAdmin):
     list_display = ("name", "year")
     list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description")
+    filter_horizontal = ("permissions",)
