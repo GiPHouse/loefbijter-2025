@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.db.models.functions import Now
+from django.utils.translation import gettext_lazy as _
 
 from .models import Board, Committee, Fraternity, Taskforce, YearClub
 
@@ -9,22 +10,23 @@ from .models import Board, Committee, Fraternity, Taskforce, YearClub
 class GroupActivityFilter(admin.SimpleListFilter):
     """Describes a filter that filters a queryset by a group's activity."""
 
-    title = "Activity"
+    title = _("Activity")
     parameter_name = "activity"
 
     def lookups(self, _request, _model_admin):
         """Return a list of filter options."""
-        return [("active", "Active"), ("inactive", "Inactive")]
+        return [(_("active"), _("Active")), (_("inactive"), _("Inactive"))]
 
     def queryset(self, _request, queryset):
         """Return the filtered queryset."""
-        if self.value() == "active":
-            return (
+        match self.value():
+            case "active":
+                return (
                 queryset.filter(date_discontinuation = None) or
                 queryset.filter(date_discontinuation__gte=Now())
-                )
-        if self.value() == "inactive":
-            return queryset.filter(date_discontinuation__lt=Now())
+            )
+            case "inactive":
+                return queryset.filter(date_discontinuation__lt=Now())
 
 
 @admin.register(Board)

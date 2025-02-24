@@ -54,7 +54,7 @@ class LoefbijterGroup(TimeStampedModel):
 
     Properties
     ----------
-    active :
+    active :    #TODO Add tests for active property
         A property that returns whether the group is currently active.
 
         It is calculated by whether :attr:`.date_discontinuation` exists and whether
@@ -83,7 +83,7 @@ class LoefbijterGroup(TimeStampedModel):
         )
 
     @property
-    def active(self):
+    def active(self): #TODO Add tests for active property
         """Return whether the group is currently active."""
         return Q(date_discontinuation=None) or Q(date_discontinuation__gte=Now())
 

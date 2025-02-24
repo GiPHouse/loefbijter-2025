@@ -1,6 +1,7 @@
 """Module containing the model definitions for a fraternity."""
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .choices import FraternityGenders
 from .group import LoefbijterGroup
@@ -19,8 +20,7 @@ class Fraternity(LoefbijterGroup):
     """
 
     class Meta:
-        # Change the plural name from standard "fraternitys"
-        verbose_name_plural = "fraternities"
+        verbose_name_plural = _("Fraternities")
 
     gender_requirement = models.PositiveSmallIntegerField(
         choices=FraternityGenders, default=FraternityGenders.MIXED
