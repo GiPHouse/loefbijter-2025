@@ -1,11 +1,12 @@
 """Module defining the model for a reservation."""
 
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
+
+from loefsys.reservations.models.reservable import ReservableItem
 
 
 class Reservation(models.Model):
@@ -38,15 +39,15 @@ class Reservation(models.Model):
         The end timestamp of the reservation.
     """
 
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    item_id = models.PositiveIntegerField()
-    item = GenericForeignKey("content_type", "item_id")
+    content_type = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
+    #reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
+    #reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
+    #log = models.ForeignKey(Log, on_delete=models.PROTECT)
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
 
     class Meta:
-        indexes = (models.Index(fields=["content_type", "item_id"]),)
         constraints = (
             # TODO Check for permissions of the reservator, depends on the implementation of permissions.  # noqa: E501
             # CheckConstraint(
@@ -59,6 +60,21 @@ class Reservation(models.Model):
                 name="end_gt_start",
                 violation_error_message="End time cannot be before the start time.",
             ),
+            # CheckConstraint(
+            #     condition=(
+            #         Q(reservee_member__isnull=True) & Q(reservee_group__isnotnull=True)
+            #     )
+            #     | (
+            #         Q(reservee_member__isnotnull=True) & Q(reservee_group__isnull=True)
+            #     ),
+            #     name="member_or_group",
+            #     violation_error_message="Only a group or a member can make reservation, not both.",  # noqa: E501
+            # ), #TODO create tests for this
+            CheckConstraint(
+                condition=Q(),
+                name="is_reservable",
+                violation_error_message="This item is not reservable at the moment.",
+            )
         )
 
     def __str__(self) -> str:
@@ -75,9 +91,11 @@ class Reservation(models.Model):
             Reservation.objects.get(
                 Q(content_type=self.content_type)
                 & Q(item_id=self.item_id)
-                & (Q(start__range=(self.start, self.end))
-                | Q(end__range=(self.start, self.end))
-                | Q(start__lt=self.start, end__gt=self.end))
+                & (
+                    Q(start__range=(self.start, self.end))
+                    | Q(end__range=(self.start, self.end))
+                    | Q(start__lt=self.start, end__gt=self.end)
+                )
             )
             raise ValidationError(
                 "This item has already been reserved during this timeslot."

@@ -28,3 +28,5 @@ class Material(ReservableItem):
         limit_choices_to={"category": ReservableCategories.MATERIAL},
     )
     size = models.CharField(max_length=10, verbose_name=_("Size"))
+
+
