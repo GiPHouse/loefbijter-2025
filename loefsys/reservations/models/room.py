@@ -24,11 +24,4 @@ class Room(ReservableItem):
         The capacity of the room.
     """
 
-    reservable_type = models.ForeignKey(
-        ReservableType,
-        on_delete=models.CASCADE,
-        verbose_name=_("Reservable type"),
-        limit_choices_to={"category": ReservableCategories.ROOM},
-    )
-    name = models.CharField(max_length=40, verbose_name=_("Room name"), unique=True)
     capacity = models.PositiveSmallIntegerField(verbose_name=_("Capacity"))

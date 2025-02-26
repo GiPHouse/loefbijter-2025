@@ -21,12 +21,6 @@ class Material(ReservableItem):
         The size of the item (if applicable?).
     """
 
-    reservable_type = models.ForeignKey(
-        ReservableType,
-        on_delete=models.CASCADE,
-        verbose_name=_("Reservable type"),
-        limit_choices_to={"category": ReservableCategories.MATERIAL},
-    )
     size = models.CharField(max_length=10, verbose_name=_("Size"))
 
 

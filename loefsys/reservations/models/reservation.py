@@ -39,7 +39,7 @@ class Reservation(models.Model):
         The end timestamp of the reservation.
     """
 
-    content_type = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
+    reserved_item = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
     #reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
     #reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
     #log = models.ForeignKey(Log, on_delete=models.PROTECT)
@@ -70,15 +70,10 @@ class Reservation(models.Model):
             #     name="member_or_group",
             #     violation_error_message="Only a group or a member can make reservation, not both.",  # noqa: E501
             # ), #TODO create tests for this
-            CheckConstraint(
-                condition=Q(),
-                name="is_reservable",
-                violation_error_message="This item is not reservable at the moment.",
-            )
         )
 
     def __str__(self) -> str:
-        return f"Reservation for {self.item}"
+        return f"Reservation for {self.reserved_item}"
 
     def clean(self):
         """Check whether any of the other reservations overlap.
@@ -89,8 +84,7 @@ class Reservation(models.Model):
         """
         try:
             Reservation.objects.get(
-                Q(content_type=self.content_type)
-                & Q(item_id=self.item_id)
+                Q(reserved_item=self.reserved_item)
                 & (
                     Q(start__range=(self.start, self.end))
                     | Q(end__range=(self.start, self.end))
@@ -101,4 +95,9 @@ class Reservation(models.Model):
                 "This item has already been reserved during this timeslot."
             )
         except Reservation.DoesNotExist:
+            if not self.reserved_item.is_reservable:
+                raise ValidationError(
+                    "This item is not reservable at the moment."
+                )
             return
+
