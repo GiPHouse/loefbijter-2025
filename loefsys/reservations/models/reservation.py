@@ -42,7 +42,6 @@ class Reservation(models.Model):
     reserved_item = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
     #reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
     #reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
-    #log = models.ForeignKey(Log, on_delete=models.PROTECT)
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
