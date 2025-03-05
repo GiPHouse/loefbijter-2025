@@ -15,8 +15,6 @@ class Material(ReservableItem):
 
     Attributes
     ----------
-    reservable_type : ~loefsys.reservations.models.reservable.ReservableType
-        The type for which the pricing is set.
     size : str
         The size of the item (if applicable?).
     """

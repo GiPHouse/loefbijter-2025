@@ -16,8 +16,6 @@ class Boat(ReservableItem):
 
     Attributes
     ----------
-    reservable_type : ~loefsys.reservations.models.reservable.ReservableType
-        The type for which the pricing is set.
     capacity : int
         The capacity of the boat.
     has_engine : bool

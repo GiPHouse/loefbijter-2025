@@ -16,10 +16,6 @@ class Room(ReservableItem):
 
     Attributes
     ----------
-    reservable_type : ~loefsys.reservations.models.reservable.ReservableType
-        The type for which the pricing is set.
-    name : str
-        The name of the room.
     capacity : int
         The capacity of the room.
     """

@@ -27,12 +27,12 @@ class Reservation(models.Model):
 
     Attributes
     ----------
-    content_type : ~django.contrib.contenttypes.models.ContentType
-        Part of the ForeignKey.
-    item_id : int
-        Part of the ForeignKey.
-    item : ~loefsys.reservations.models.reservable.ReservableItem
-        The item that is reserved.
+    reserved_item : ~loefsys.reservations.models.reservable.ReservableItem
+        The ForeignKey.
+    reservee_member : ~loefsys.users.models.member.MemberDetails
+        The person reserving the item, is null if a group is reserving the item.
+    reservee_group : ~loefsys.groups.models.group.LoefBijterGroup
+        The group reserving the item, is null if a person is reserving the item.
     start : ~datetime.datetime
         The start timestamp of the reservation.
     end : ~datetime.datetime
