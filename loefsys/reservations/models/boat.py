@@ -26,6 +26,12 @@ class Boat(ReservableItem):
         The provider of the boat.
     """
 
+    reservable_type = models.ForeignKey(
+        ReservableType,
+        on_delete=models.CASCADE,
+        verbose_name=_("Reservable type"),
+        limit_choices_to={"category": ReservableCategories.BOAT},
+    )
     capacity = models.PositiveSmallIntegerField(verbose_name=_("Capacity"))
     has_engine = models.BooleanField(
         default=False, verbose_name=_("Boat has an engine")

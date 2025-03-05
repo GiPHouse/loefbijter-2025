@@ -1,4 +1,0 @@
-"""Module defining the model for the reservation forms."""
-
-from django.db import models
-from django.utils.translation import gettext_lazy as _
