@@ -99,3 +99,4 @@ class Reservation(models.Model):
                     "This item is not reservable at the moment."
                 )
             return
+
