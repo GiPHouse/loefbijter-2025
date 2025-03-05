@@ -3,6 +3,7 @@
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 from django.forms import ValidationError
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from loefsys.reservations.models.reservable import ReservableItem
@@ -72,6 +73,9 @@ class Reservation(models.Model):
 
     def __str__(self) -> str:
         return f"Reservation for {self.reserved_item}"
+
+    def get_absolute_url(self):
+        return reverse("reservation-detail", kwargs={"pk": self.pk})
 
     def clean(self):
         """Check whether any of the other reservations overlap.

@@ -1,4 +1,22 @@
-from django.http import HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-def index(request):
-    return HttpResponse("Hello, you are at the reservations index")
+from loefsys.reservations.models.reservation import Reservation
+
+
+class ReservationCreateView(LoginRequiredMixin, CreateView):
+    model = Reservation
+    fields = ["reserved_item", "start", "end"]
+
+
+class ReservationUpdateView(LoginRequiredMixin, UpdateView):
+    model = Reservation
+    fields = ["reserved_item", "start", "end"]
+
+
+class ReservationDeleteView(LoginRequiredMixin, DeleteView):
+    model = Reservation
+
+class ReservationDetailView(LoginRequiredMixin, DetailView):
+    model = Reservation
