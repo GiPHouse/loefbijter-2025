@@ -18,4 +18,4 @@ class FraternityGenders(models.IntegerChoices):
     """Used for mainly female fraternities."""
 
     MALE = 2, _("Male")
-    """Used for minly male fraternities."""
+    """Used for mainly male fraternities."""
