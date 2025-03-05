@@ -1,5 +1,6 @@
-from django.http import HttpResponseRedirect  # noqa: D100
-from django.shortcuts import render
+"""Module containing the views."""
+
+from django.shortcuts import redirect, render
 
 from .profile.forms import SignupForm
 
@@ -10,7 +11,8 @@ def signup(request):
         form = SignupForm(request.POST)
 
         if form.is_valid():
-            return HttpResponseRedirect("/admin/")
+            form.save()
+            return redirect("/admin/")
 
     else:
         form = SignupForm()

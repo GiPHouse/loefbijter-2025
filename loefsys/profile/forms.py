@@ -1,10 +1,13 @@
 """A forms module to handle input for the sign up page."""
 
-from django import forms
+from django.contrib.auth.forms import UserCreationForm
+
+from ..users.models.user import User
 
 
-class SignupForm(forms.Form):
+class SignupForm(UserCreationForm):
     """Sign up Form for email and password."""
 
-    email = forms.CharField(label="email", max_length=100)
-    password = forms.CharField(label="password", max_length=100)
+    class Meta:
+        model = User
+        fields = ("email",)
