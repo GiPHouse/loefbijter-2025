@@ -1,3 +1,4 @@
+"""Module containing the url definition of the reservations app."""
 from django.urls import path
 
 from .views import (
