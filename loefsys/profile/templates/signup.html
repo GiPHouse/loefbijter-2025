@@ -4,8 +4,6 @@
 
 <body>
     <form action="/signup/" method="post">
-        <label for="email">Email adress:</label>
-        <label for="pass">Password:</label>
         {% csrf_token %}
         {{ form }}
 
