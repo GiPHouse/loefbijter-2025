@@ -15,15 +15,15 @@ class GroupActivityFilter(admin.SimpleListFilter):
 
     def lookups(self, _request, _model_admin):
         """Return a list of filter options."""
-        return [(_("active"), _("Active")), (_("inactive"), _("Inactive"))]
+        return [("active", _("Active")), ("inactive", _("Inactive"))]
 
     def queryset(self, _request, queryset):
         """Return the filtered queryset."""
         match self.value():
             case "active":
                 return (
-                queryset.filter(date_discontinuation = None) or
-                queryset.filter(date_discontinuation__gte=Now())
+                queryset.filter(date_discontinuation = None)
+                | queryset.filter(date_discontinuation__gte=Now())
             )
             case "inactive":
                 return queryset.filter(date_discontinuation__lt=Now())
@@ -53,7 +53,7 @@ class CommitteeAdmin(admin.ModelAdmin):
 class FraternityAdmin(admin.ModelAdmin):
     """Admin interface for the fraternity model."""
 
-    list_display = ("name", "gender_requirement")
+    list_display = ("name", "gender_base")
     list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description")
     filter_horizontal = ("permissions",)

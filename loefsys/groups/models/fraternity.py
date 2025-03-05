@@ -11,17 +11,17 @@ class Fraternity(LoefbijterGroup):
     """Model defining fraternities within the associations.
 
     Fraternities are groups of members that want to do more outside of the regular
-    association activities. Fraternities can be male only, female only or mixed.
+    association activities. Fraternities can be mainly male, mainly female or mixed.
 
     Attributes
     ----------
-    gender_requirement : FraternityGenders
+    gender_base : FraternityGenders
         The type of fraternity.
     """
 
     class Meta:
         verbose_name_plural = _("Fraternities")
 
-    gender_requirement = models.PositiveSmallIntegerField(
+    gender_base = models.PositiveSmallIntegerField(
         choices=FraternityGenders, default=FraternityGenders.MIXED
     )
