@@ -1,6 +1,5 @@
 """Module defining the model for a reservation."""
 
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 from django.forms import ValidationError
@@ -40,8 +39,8 @@ class Reservation(models.Model):
     """
 
     reserved_item = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
-    #reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
-    #reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
+    # reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
+    # reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
@@ -95,8 +94,5 @@ class Reservation(models.Model):
             )
         except Reservation.DoesNotExist:
             if not self.reserved_item.is_reservable:
-                raise ValidationError(
-                    "This item is not reservable at the moment."
-                )
+                raise ValidationError("This item is not reservable at the moment.")
             return
-

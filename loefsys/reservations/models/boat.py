@@ -3,8 +3,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .choices import FleetChoices, ReservableCategories
-from .reservable import ReservableItem, ReservableType
+from .choices import FleetChoices
+from .reservable import ReservableItem
 
 
 class Boat(ReservableItem):

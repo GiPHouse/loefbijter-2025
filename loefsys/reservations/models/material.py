@@ -3,8 +3,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .choices import ReservableCategories
-from .reservable import ReservableItem, ReservableType
+from .reservable import ReservableItem
 
 
 class Material(ReservableItem):
@@ -20,5 +19,3 @@ class Material(ReservableItem):
     """
 
     size = models.CharField(max_length=10, verbose_name=_("Size"))
-
-

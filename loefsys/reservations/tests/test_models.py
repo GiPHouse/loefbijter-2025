@@ -1,18 +1,11 @@
 import datetime
 
-from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.forms import ValidationError
 from django.test import TestCase
 from django_dynamic_fixture import G
 
-from loefsys.reservations.models import (
-    Boat,
-    Material,
-    ReservableType,
-    Reservation,
-    Room,
-)
+from loefsys.reservations.models import Boat, Material, ReservableType, Reservation
 from loefsys.reservations.models.choices import Locations, ReservableCategories
 from loefsys.reservations.models.reservable import ReservableItem
 
@@ -62,37 +55,34 @@ class ReservationTestCase(TestCase):
 
     def setUp(self):
         self.reservable_type = ReservableType(
-                name="Room",
-                category=ReservableCategories.ROOM,
-                description="GiPHouse room"
-            )
+            name="Room", category=ReservableCategories.ROOM, description="GiPHouse room"
+        )
         self.reservable_type.save()
 
-        self.reservable_item= ReservableItem(
-            name="room",
-            description="a room",
+        self.reservable_item = ReservableItem(
+            name="Reservable room",
+            description="A room",
             reservable_type=self.reservable_type,
             location=Locations.KRAAIJ,
-            is_reservable=True
-            )
+            is_reservable=True,
+        )
         self.reservable_item.save()
 
-        self.unreservable_item= ReservableItem(
-            name="room",
-            description="a room",
+        self.unreservable_item = ReservableItem(
+            name="Unreservable room",
+            description="A room",
             reservable_type=self.reservable_type,
             location=Locations.KRAAIJ,
-            is_reservable=False
-            )
+            is_reservable=False,
+        )
         self.unreservable_item.save()
-
 
     def test_create(self):
         """Tests that Reservation instance can be created."""
         reservation = Reservation(
             reserved_item=self.reservable_item,
             start=datetime.datetime(2025, 1, 1, hour=12, minute=0),
-                end=datetime.datetime(2025, 1, 1, hour=13, minute=0),
+            end=datetime.datetime(2025, 1, 1, hour=13, minute=0),
         )
         reservation.save()
         self.assertIsNotNone(reservation)
@@ -183,7 +173,7 @@ class ReservationTestCase(TestCase):
             description="a room",
             reservable_type=self.reservable_type,
             location=Locations.KRAAIJ,
-            is_reservable=True
+            is_reservable=True,
         )
         reservable_item2.save()
 
