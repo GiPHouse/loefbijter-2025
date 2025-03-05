@@ -3,7 +3,7 @@
 from django.contrib.auth.models import Permission
 from django.db import models
 from django.db.models import CheckConstraint, Q
-from django.db.models.functions import Now
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
@@ -54,7 +54,7 @@ class LoefbijterGroup(TimeStampedModel):
 
     Properties
     ----------
-    active :    #TODO Add tests for active property
+    active :
         A property that returns whether the group is currently active.
 
         It is calculated by whether :attr:`.date_discontinuation` exists and whether
@@ -62,7 +62,7 @@ class LoefbijterGroup(TimeStampedModel):
     """
 
     name = models.CharField(_("Name"), max_length=150, unique=True)
-    description = models.TextField(verbose_name=_("Description"))
+    description = models.TextField(verbose_name=_("Description"), blank=True)
     permissions = models.ManyToManyField(
         Permission, verbose_name=_("Permissions"), blank=True
     )
@@ -83,9 +83,12 @@ class LoefbijterGroup(TimeStampedModel):
         )
 
     @property
-    def active(self): #TODO Add tests for active property
+    def active(self):
         """Return whether the group is currently active."""
-        return Q(date_discontinuation=None) or Q(date_discontinuation__gte=Now())
+        return (
+            self.date_discontinuation is None or
+            self.date_discontinuation >= now().__str__()
+        )
 
     display_members = models.BooleanField(_("Display group members"))
 
