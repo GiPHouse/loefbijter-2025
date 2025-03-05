@@ -7,6 +7,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("", views.main, name="main"),
     path("signup/", views.signup, name="signup_page"),
     path("admin/", admin.site.urls),
     *debug_toolbar_urls(),
