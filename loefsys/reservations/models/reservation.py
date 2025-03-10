@@ -3,6 +3,7 @@
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 from django.forms import ValidationError
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from loefsys.reservations.models.reservable import ReservableItem
@@ -26,22 +27,21 @@ class Reservation(models.Model):
 
     Attributes
     ----------
-    content_type : ~django.contrib.contenttypes.models.ContentType
-        Part of the ForeignKey.
-    item_id : int
-        Part of the ForeignKey.
-    item : ~loefsys.reservations.models.reservable.ReservableItem
-        The item that is reserved.
+    reserved_item : ~loefsys.reservations.models.reservable.ReservableItem
+        The ForeignKey.
+    reservee_member : ~loefsys.users.models.member.MemberDetails
+        The person reserving the item, is null if a group is reserving the item.
+    reservee_group : ~loefsys.groups.models.group.LoefBijterGroup
+        The group reserving the item, is null if a person is reserving the item.
     start : ~datetime.datetime
         The start timestamp of the reservation.
     end : ~datetime.datetime
         The end timestamp of the reservation.
     """
 
-    content_type = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
+    reserved_item = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
     # reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
     # reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
-    # log = models.ForeignKey(Log, on_delete=models.PROTECT)
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
@@ -61,23 +61,24 @@ class Reservation(models.Model):
             ),
             # CheckConstraint(
             #     condition=(
-            #         Q(reservee_member__isnull=True) & Q(reservee_group__isnotnull=True)  # noqa: E501
+            #         Q(reservee_member__isnull=True) &
+            #         Q(reservee_group__isnotnull=True)
             #     )
             #     | (
-            #         Q(reservee_member__isnotnull=True) & Q(reservee_group__isnull=True)  # noqa: E501
+            #         Q(reservee_member__isnotnull=True) &
+            #         Q(reservee_group__isnull=True)
             #     ),
             #     name="member_or_group",
             #     violation_error_message="Only a group or a member can make reservation, not both.",  # noqa: E501
             # ), #TODO create tests for this
-            CheckConstraint(
-                condition=Q(),
-                name="is_reservable",
-                violation_error_message="This item is not reservable at the moment.",
-            ),
         )
 
     def __str__(self) -> str:
-        return f"Reservation for {self.item}"
+        return f"Reservation for {self.reserved_item}"
+
+    def get_absolute_url(self):
+        """Return the detail page url for this reservation."""
+        return reverse("reservation-detail", kwargs={"pk": self.pk})
 
     def clean(self):
         """Check whether any of the other reservations overlap.
@@ -88,8 +89,7 @@ class Reservation(models.Model):
         """
         try:
             Reservation.objects.get(
-                Q(content_type=self.content_type)
-                & Q(item_id=self.item_id)
+                Q(reserved_item=self.reserved_item)
                 & (
                     Q(start__range=(self.start, self.end))
                     | Q(end__range=(self.start, self.end))
@@ -100,4 +100,6 @@ class Reservation(models.Model):
                 "This item has already been reserved during this timeslot."
             )
         except Reservation.DoesNotExist:
+            if not self.reserved_item.is_reservable:
+                raise ValidationError("This item is not reservable at the moment.")
             return
