@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.db.models.functions import Now
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 from .models import Board, Committee, Fraternity, Taskforce, YearClub
@@ -21,12 +22,17 @@ class GroupActivityFilter(admin.SimpleListFilter):
         """Return the filtered queryset."""
         match self.value():
             case "active":
-                return (
-                queryset.filter(date_discontinuation = None)
-                | queryset.filter(date_discontinuation__gte=Now())
-            )
+                return queryset.filter(date_discontinuation=None) | queryset.filter(
+                    date_discontinuation__gte=Now()
+                )
             case "inactive":
                 return queryset.filter(date_discontinuation__lt=Now())
+
+
+@admin.action(description="Make group inactive today")
+def make_inactive(_modeladmin, _request, queryset):
+    """Set the date of discontinuation to today."""
+    queryset.update(date_discontinuation=now().date())
 
 
 @admin.register(Board)
@@ -37,6 +43,7 @@ class BoardAdmin(admin.ModelAdmin):
     list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description", "year")
     filter_horizontal = ("permissions",)
+    actions = (make_inactive,)
 
 
 @admin.register(Committee)
@@ -47,6 +54,7 @@ class CommitteeAdmin(admin.ModelAdmin):
     list_filter = ("mandatory", GroupActivityFilter)
     search_fields = ("name", "description")
     filter_horizontal = ("permissions",)
+    actions = (make_inactive,)
 
 
 @admin.register(Fraternity)
@@ -57,6 +65,7 @@ class FraternityAdmin(admin.ModelAdmin):
     list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description")
     filter_horizontal = ("permissions",)
+    actions = (make_inactive,)
 
 
 @admin.register(Taskforce)
@@ -67,6 +76,7 @@ class TaskforceAdmin(admin.ModelAdmin):
     list_filter = (GroupActivityFilter, "requires_nda")
     search_fields = ("name", "description")
     filter_horizontal = ("permissions",)
+    actions = (make_inactive,)
 
 
 @admin.register(YearClub)
@@ -77,3 +87,4 @@ class YearClubAdmin(admin.ModelAdmin):
     list_filter = (GroupActivityFilter,)
     search_fields = ("name", "description")
     filter_horizontal = ("permissions",)
+    actions = (make_inactive,)
