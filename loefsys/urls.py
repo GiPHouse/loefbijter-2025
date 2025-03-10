@@ -10,6 +10,6 @@ urlpatterns = [
     path("", views.main, name="main"),
     path("signup/", views.signup, name="signup_page"),
     path("admin/", admin.site.urls),
-    path("reservations/", include("loefsys.reservations.urls"))
+    path("reservations/", include("loefsys.reservations.urls")),
     *debug_toolbar_urls(),
 ]
