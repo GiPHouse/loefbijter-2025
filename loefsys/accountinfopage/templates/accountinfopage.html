@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Account information{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'output.css' %}">
+</head>
+<body>
+
+{% block content %}
+<h1>Account information</h1>
+
+<div id="account-information">
+    <div id="personal-information">
+        <div>
+            <h2>Name</h2>
+            <p>{{ user_info.name }}</p>
+        </div>
+        <div>
+            <h2>Email address</h2>
+            <p>{{ user_info.email }}</p>
+        </div>
+        <div>
+            <h2>Phone number</h2>
+            <p>{{ user_info.phone_number }}</p>
+        </div>
+        <button>Edit profile</button>
+    </div>
+    {% if member_info|length != 0 %}
+        <div id="membership-information">
+            <div>
+                <h2>Date of birth</h2>
+                <p>{{ member_info.birthday }}</p>
+            </div>
+            <div>
+                <h2>Member since</h2>
+                <p>{{ member_info.member_since }}</p>
+            </div>
+            <div>
+                <h2>Year of joining</h2>
+                <p>{{ member_info.year_of_joining }}</p>
+            </div>
+            <div>
+                <h2>Participated activities</h2>
+                {% for activity in member_info.activities %}
+                <!-- {% include 'participatedactivity.html' with activity=activity %} -->
+                    <div>
+                        <h3>{{ activity.title }}</h3>
+                        <p>{{ activity.description }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <div>
+                <h2>My groups</h2>
+                <!-- {% for group in member_info.groups %}
+                    <h3>{{ group.name }}</h3>
+                    <p>{{ group.description }}</p>
+                {% endfor %} -->
+            </div>
+
+        </div>
+    {% endif %}
+    </div>
+
+{% endblock %}
+
+</body>
+</html>
