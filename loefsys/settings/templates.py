@@ -10,7 +10,6 @@ class TemplateSettings:
         return (
             {
                 "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": ["loefsys/indexpage/templates", "loefsys/profile/templates"],
                 "APP_DIRS": True,
                 "OPTIONS": {"context_processors": self.templates_context_processors()},
             },
