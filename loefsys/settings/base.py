@@ -49,6 +49,7 @@ class BaseSettings(ClassySettings):
             "loefsys.users",
             "loefsys.indexpage",
             "loefsys.profile",
+            "loefsys.accountinfopage",
         )
 
     def INSTALLED_APPS(self) -> Sequence[str]:  # noqa N802 D102
