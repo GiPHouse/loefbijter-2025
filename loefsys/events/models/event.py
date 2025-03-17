@@ -6,6 +6,7 @@ from typing import Optional
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
+from django.db.models import CheckConstraint, F, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel, TitleSlugDescriptionModel
@@ -101,8 +102,17 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
 
     objects = EventManager()
 
+    class Meta:
+        constraints=(
+            CheckConstraint(
+                condition=Q(end__gt=F("start")),
+                name="event_end_gt_start",
+                violation_error_message="End time cannot be before the start time.",
+            ),
+        )
+
     def __str__(self):
-        return f"{self.__class__.__name__} {self.title}"
+        return f"{self.title}"
 
     def mandatory_registration(self) -> bool:
         """Check whether this event has mandatory registration.
