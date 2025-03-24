@@ -68,6 +68,9 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
     start = models.DateTimeField(_("Start time"))
     end = models.DateTimeField(_("End time"))
 
+    registration_deadline = models.DateTimeField(_("Registration deadline"))
+    cancelation_deadline = models.DateTimeField(_("Cancelation deadline"))
+
     category = models.PositiveSmallIntegerField(
         choices=EventCategories, verbose_name=_("Category")
     )
