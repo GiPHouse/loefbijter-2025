@@ -15,31 +15,27 @@ def accountinfo(request):
         "phone_number": request.user.phone_number,
         "picture": "",
         "activities": "",
-        "groups": request.user.groups,
+        "groups": request.user.groups.all(),
     }
 
     member_info = []
     qs_member = MemberDetails.objects.filter(user=request.user)
-    if len(qs_member) > 1:
-        raise Exception("User has multiple members")
-    elif len(qs_member) == 1:
+    if qs_member.count() == 1:
         member = qs_member[0]
         qs_membership = Membership.objects.filter(member=member)
-        if len(qs_membership) == 1:
-            membership = qs_membership[0]
+        if qs_membership.count() > 0:
+            membership = qs_membership[::-1][0]
             member_info = {
-                "birthday": member.birthday,
-                "picture": "",
-                "member_since": membership.start,
-                "year_of_joining": membership.start.year,
+                "birthday": member.birthday.__str__(),
+                "member_since": membership.start.__str__(),
+                "year_of_joining": membership.start.year.__str__(),
                 "activities": "",
             }
         else:
-            raise Exception("Member has no or more than one membership")
+            raise Exception("Member has no membership")
 
     return render(
         request,
         "accountinfopage.html",
-        {"user_info": user_info},
-        {"member_info": member_info},
+        {"user_info": user_info, "member_info": member_info},
     )
