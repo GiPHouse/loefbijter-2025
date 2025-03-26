@@ -132,6 +132,13 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
 
     @property
     def has_form_fields(self) -> bool:
+        """Check if the event has associated form fields.
+
+        Returns
+        -------
+        bool
+            ``True`` if the event has form fields, otherwise ``False``.
+        """
         return self.registrationformfield_set.count() > 0
 
     eventregistration_set: EventRegistrationManager
@@ -243,7 +250,6 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
 class EventOrganizer(TimeStampedModel):
     """Utility model collecting the organizers for an event.
 
-    #TODO make inline admin page
     Attributes
     ----------
     created : ~datetime.datetime
@@ -256,9 +262,8 @@ class EventOrganizer(TimeStampedModel):
         The event that the current organizer organizes.
     groups : ~django.db.models.query.QuerySet of ~loefsys.groups.models.LoefbijterGroup
         The groups organizing this event.
-    #TODO Add many to many users relation
-    contacts : ~django.db.models.query.QuerySet of ~loefsys.contacts.models.Contact
-        Additional individuals organizing this event.
+    user : ~django.db.models.query.QuerySet of ~loefsys.users.models.User
+        Individuals organizing this event.
     """
 
     event = models.OneToOneField(
@@ -266,8 +271,9 @@ class EventOrganizer(TimeStampedModel):
     )
 
     groups = models.ManyToManyField(
-        to=LoefbijterGroup, related_name="events_organizer", blank=True
+        to=LoefbijterGroup, related_name="organizing_group", blank=True
     )
-    contacts = models.ManyToManyField(
-        to=get_user_model(), related_name="events_contact"
+
+    user = models.ManyToManyField(
+        to=get_user_model(), related_name="organizer", blank=True
     )
