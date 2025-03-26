@@ -1,7 +1,6 @@
 """In this module, the models for events are defined."""
 
 from decimal import Decimal
-from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.core import validators
@@ -42,8 +41,16 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         The start date and time of the event.
     end : ~datetime.datetime
         The end date and time of the event.
+    registration_start : ~datetime.datetime
+        The start date and time of the registration window
+    registration_deadline : ~datetime.datetime
+        The end date and time of the registration window
+    cancelation_deadline : ~datetime.datetime
+        The end date and time of the cancelation window
     category : ~loefsys.events.models.choices.EventCategories
         The category of the event.
+    capacity : ~integer.Integer
+        The maximum number of participants if there is one
     price : ~decimal.Decimal
         The price.
     fine : ~decimal.Decimal
@@ -58,6 +65,8 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         Flag to determine if non-members can register.
     published : bool
         Flag to determine if the event is publicly visible.
+    send_cancel_email : ~bool
+        Flag to determine if an email should be sent if a participant deregisters
     eventregistration_set : ~loefsys.events.models.managers.EventRegistrationManager
         A manager of registrations for this event.
 
@@ -68,11 +77,23 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
     start = models.DateTimeField(_("Start time"))
     end = models.DateTimeField(_("End time"))
 
-    registration_deadline = models.DateTimeField(_("Registration deadline"))
-    cancelation_deadline = models.DateTimeField(_("Cancelation deadline"))
+    registration_start = models.DateTimeField(
+        _("Start of registration window"), blank=True, null=True
+        )
+
+    registration_deadline = models.DateTimeField(
+        _("Registration deadline"), blank=True, null=True
+        )
+    cancelation_deadline = models.DateTimeField(
+        _("Cancelation deadline"), blank=True, null=True
+        )
 
     category = models.PositiveSmallIntegerField(
         choices=EventCategories, verbose_name=_("Category")
+    )
+
+    capacity = models.PositiveSmallIntegerField(
+        _("Maximum number of participants"), blank=True, null=True
     )
 
     price = models.DecimalField(
@@ -100,11 +121,19 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
     )
     published = models.BooleanField(_("Published"), default=False)
 
+    send_cancel_email = models.BooleanField(
+        _("Send cancellation notifications"),
+        default=True,
+        help_text=_(
+            "Send an email to the organising party when a member "
+            "cancels their registration after the deadline."
+        ),
+    )
+
     @property
     def has_form_fields(self) -> bool:
         return self.registrationformfield_set.count() > 0
 
-    registration_details: Optional["MandatoryRegistrationDetails"]
     eventregistration_set: EventRegistrationManager
 
     objects = EventManager()
@@ -141,11 +170,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         """
         if not self.published:
             return False
-        return (
-            self.registration_details.registration_window_open()
-            if hasattr(self, "registration_details")
-            else timezone.now() < self.end
-        )
+        return self.registration_deadline < timezone.now() < self.cancelation_deadline
 
     def max_capacity_reached(self) -> bool:
         """Check whether the max capacity for this event is reached.
@@ -156,9 +181,8 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
             ``True`` when the event is full and ``False`` if there are places available.
         """
         return (
-            self.registration_details.capacity_reached()
-            if self.mandatory_registration()
-            else False
+            self.capacity is not None
+            and self.capacity <= self.event.eventregistration_set.active().count()
         )
 
     def fine_on_cancellation(self) -> bool:
@@ -201,62 +225,6 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         self.eventregistration_set.bulk_update(objs, ["status", "modified"])
 
 
-class MandatoryRegistrationDetails(TimeStampedModel):
-    """Model containing extra information for an event that requires registration.
-
-    #TODO ADD to above class
-    Attributes
-    ----------
-    event : ~loefsys.events.models.event.Event
-        The event that requires these details.
-    start : ~datetime.datetime
-        The opening of the registration window.
-    end : ~datetime.datetime
-        The closing of the registration window.
-    cancel_deadline : ~datetime.datetime or None
-        The deadline until which registration can be cancelled free of charge.
-    send_cancel_email : bool
-        Flag that shows whether people receive a confirmation email upon cancellation.
-    capacity : int or None
-        The capacity for the event, or `None` if there is no capacity.
-    """
-
-    event = models.OneToOneField(
-        Event,
-        on_delete=models.CASCADE,
-        related_name="registration_details",
-        verbose_name=_("Event"),
-    )
-
-    start = models.DateTimeField(
-        _("Registration start"),
-        help_text=_(
-            "Prefer times when people don't have lectures, e.g. 12:30 instead of 13:37."
-        ),
-    )
-    end = models.DateTimeField(
-        _("Registration end"),
-        help_text=_(
-            "If you set a registration period registration will be "
-            "required. If you don't set one, registration won't be "
-            "required."
-        ),
-    )
-
-    cancel_deadline = models.DateTimeField(_("Cancel deadline"), null=True, blank=True)
-    send_cancel_email = models.BooleanField(
-        _("Send cancellation notifications"),
-        default=True,
-        help_text=_(
-            "Send an email to the organising party when a member "
-            "cancels their registration after the deadline."
-        ),
-    )
-
-    capacity = models.PositiveSmallIntegerField(
-        _("Maximum number of participants"), blank=True, null=True
-    )
-
     def registration_window_open(self) -> bool:
         """Determine whether it is possible for users to register for this event.
 
@@ -270,19 +238,6 @@ class MandatoryRegistrationDetails(TimeStampedModel):
             A boolean that defines whether registrations are in the registration window.
         """
         return self.start < timezone.now() < self.end
-
-    def capacity_reached(self) -> bool:
-        """Determine whether the maximum capacity for the event has been reached.
-
-        Returns
-        -------
-        bool
-            A boolean that defines whether the capacity has been reached.
-        """
-        return (
-            self.capacity is not None
-            and self.capacity <= self.event.eventregistration_set.active().count()
-        )
 
 
 class EventOrganizer(TimeStampedModel):

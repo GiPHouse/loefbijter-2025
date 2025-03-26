@@ -17,7 +17,10 @@ class RegistrationFormInline(admin.TabularInline):
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     """Admin interface for the boat, material, room, reservabletype and reservation."""
-    fields = ('title', 'description', 'start', 'end', 'registration_deadline', 'cancelation_deadline', 'price', 'location', 'category')
+
+    fields = ("title", "description", "start", "end", "registration_start",
+              "registration_deadline", "cancelation_deadline", "price",
+              "capacity", "location", "category")
     inlines = [RegistrationFormInline]
 
 @admin.register(EventRegistration)
