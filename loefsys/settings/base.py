@@ -39,9 +39,6 @@ class BaseSettings(ClassySettings):
         return ("django.contrib.contenttypes",)
 
     def THIRD_PARTY_APPS(self) -> Sequence[str]:  # noqa N802 D102
-        return ("compressor",)
-
-    def DEBUG_APPS(self) -> Sequence[str]:    # noqa N802 D102
         return ("debug_toolbar",) if self.DEBUG else ()
 
     def LOCAL_APPS(self) -> Sequence[str]:  # noqa N802 D102
@@ -59,7 +56,6 @@ class BaseSettings(ClassySettings):
             *cast(Sequence[str], self.DJANGO_APPS),
             *cast(Sequence[str], self.THIRD_PARTY_APPS),
             *cast(Sequence[str], self.LOCAL_APPS),
-            *cast(Sequence[str], self.DEBUG_APPS),
         )
 
     def MIDDLEWARE(self) -> Sequence[str]:  # noqa N802 D102

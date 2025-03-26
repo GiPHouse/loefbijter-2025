@@ -15,17 +15,6 @@ class TemplateSettings:
             },
         )
 
-    def COMPRESS_ROOT(self) -> str:  # noqa N802 D102
-        return self.BASE_DIR / "static"
-
-    def COMPRESS_ENABLED(self) -> bool:  # noqa N802 D102
-        return not self.DEBUG
-
-    def STATICFILES_FINDERS(self) -> Sequence[str]:  # noqa N802 D102
-        return (
-            "compressor.finders.CompressorFinder",
-        )
-
     def templates_context_processors(self) -> Sequence[str]:  # noqa D102
         return (
             "django.template.context_processors.debug",
