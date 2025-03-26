@@ -9,5 +9,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("signup/", include("loefsys.profile.urls")),
     path("reservations/", include("loefsys.reservations.urls")),
+    path("events/", include("loefsys.events.urls")),
     *debug_toolbar_urls(),
 ]

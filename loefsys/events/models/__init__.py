@@ -2,5 +2,6 @@
 
 from .event import Event, MandatoryRegistrationDetails
 from .registration import EventRegistration
+from .registration_form_field import RegistrationFormField
 
 __all__ = ["Event", "EventRegistration", "MandatoryRegistrationDetails"]

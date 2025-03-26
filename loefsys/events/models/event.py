@@ -100,6 +100,10 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
     )
     published = models.BooleanField(_("Published"), default=False)
 
+    @property
+    def has_form_fields(self) -> bool:
+        return self.registrationformfield_set.count() > 0
+
     registration_details: Optional["MandatoryRegistrationDetails"]
     eventregistration_set: EventRegistrationManager
 
@@ -200,6 +204,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
 class MandatoryRegistrationDetails(TimeStampedModel):
     """Model containing extra information for an event that requires registration.
 
+    #TODO ADD to above class
     Attributes
     ----------
     event : ~loefsys.events.models.event.Event
@@ -283,6 +288,7 @@ class MandatoryRegistrationDetails(TimeStampedModel):
 class EventOrganizer(TimeStampedModel):
     """Utility model collecting the organizers for an event.
 
+    #TODO make inline admin page
     Attributes
     ----------
     created : ~datetime.datetime
@@ -295,6 +301,7 @@ class EventOrganizer(TimeStampedModel):
         The event that the current organizer organizes.
     groups : ~django.db.models.query.QuerySet of ~loefsys.groups.models.LoefbijterGroup
         The groups organizing this event.
+    #TODO Add many to many users relation
     contacts : ~django.db.models.query.QuerySet of ~loefsys.contacts.models.Contact
         Additional individuals organizing this event.
     """

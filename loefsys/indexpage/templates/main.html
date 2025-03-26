@@ -1,4 +1,4 @@
-{% extends "master.html" %}
+{% extends "base.html" %}
 
 {% block title %}
     Home - Loefbijter
@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="flex flex-col h-screen">
-        <section id="announcements" class="bg-[#234193] p-8 flex flex-col">
+        <section id="announcements" class="bg-black p-8 flex flex-col">
             <h1 class="text-6xl font-bold text-white pb-8 mt-4">WELKOM</h1>
             {% for announcement in announcements %}
                 <button onClick="(function() { alert('test') })()" class="p-4 border-2 border-red-500 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-white hover:bg-gray-300 text-left">

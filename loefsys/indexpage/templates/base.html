@@ -1,9 +1,13 @@
+{% load compress %}
 {% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
+
+    {% compress css %}
     <link rel="stylesheet" href="{% static 'output.css' %}">
+    {% endcompress %}
 </head>
 <body>
 
