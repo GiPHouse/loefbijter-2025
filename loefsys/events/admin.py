@@ -26,7 +26,7 @@ class EventOrganizerInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    """Admin interface for the boat, material, room, reservabletype and reservation."""
+    """Admin interface for the fields of the event class."""
 
     fields = ("title", "description", "start", "end", "registration_start",
               "registration_deadline", "cancelation_deadline", "price",

@@ -175,7 +175,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         bool
             A boolean that defines whether registrations are open.
         """
-        if not self.published:
+        if not self.published or not self.registration_deadline or not self.cancelation_deadline:  # noqa: E501
             return False
         return self.registration_deadline < timezone.now() < self.cancelation_deadline
 
