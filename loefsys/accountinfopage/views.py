@@ -1,14 +1,15 @@
 """Module defining the views for accountinfopage."""
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from loefsys.users.models import MemberDetails, Membership
 
+from . import forms
 
-@login_required(login_url="signup_page")
-def accountinfo(request):
-    """View for loading the accountinformation page."""
+
+def get_account_info(request):
+    """Get account information from request."""
     user_info = {
         "name": request.user.display_name,
         "email": request.user.email,
@@ -27,12 +28,54 @@ def accountinfo(request):
             membership = qs_membership[::-1][0]
             member_info = {
                 "birthday": member.birthday.__str__(),
+                "show_birthday": member.show_birthday,
                 "member_since": membership.start.__str__(),
                 "year_of_joining": membership.start.year.__str__(),
                 "activities": "",
             }
         else:
             raise Exception("Member has no membership")
+    return user_info, member_info
+
+
+@login_required(login_url="signup_page")
+def accountinfoedit(request):
+    """View for editing accountinformation."""
+    if request.method == "POST":
+        user_form = forms.EditUserInfo(
+            request.POST, request.FILES, instance=request.user
+        )
+        member_form = forms.EditMemberInfo(
+            request.POST,
+            request.FILES,
+            instance=MemberDetails.objects.filter(user=request.user)[0],
+        )
+        if user_form.is_valid() and member_form.is_valid():
+            user_form.save()
+            member_form.save()
+            return redirect("accountinfo")
+        else:
+            if not user_form.is_valid():
+                print(user_form.errors)
+            if not member_form.is_valid():
+                print(member_form.errors)
+
+    else:
+        user_form = forms.EditUserInfo(instance=request.user)
+        member_form = forms.EditMemberInfo(
+            instance=MemberDetails.objects.filter(user=request.user)[0]
+        )
+        return render(
+            request,
+            "accountinfoeditpage.html",
+            {"user_form": user_form, "member_form": member_form},
+        )
+
+
+@login_required(login_url="signup_page")
+def accountinfo(request):
+    """View for loading the accountinformation page."""
+    user_info, member_info = get_account_info(request)
 
     return render(
         request,
