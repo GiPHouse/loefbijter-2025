@@ -54,22 +54,17 @@ def accountinfoedit(request):
             user_form.save()
             member_form.save()
             return redirect("accountinfo")
-        else:
-            if not user_form.is_valid():
-                print(user_form.errors)
-            if not member_form.is_valid():
-                print(member_form.errors)
-
     else:
         user_form = forms.EditUserInfo(instance=request.user)
         member_form = forms.EditMemberInfo(
             instance=MemberDetails.objects.filter(user=request.user)[0]
         )
-        return render(
-            request,
-            "accountinfoeditpage.html",
-            {"user_form": user_form, "member_form": member_form},
-        )
+
+    return render(
+        request,
+        "accountinfoeditpage.html",
+        {"user_form": user_form, "member_form": member_form},
+    )
 
 
 @login_required(login_url="signup_page")
