@@ -1,7 +1,8 @@
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import DetailView, FormView
+
 from .forms import EventFieldsForm
 from .models import Event, RegistrationFormField
-from django.views.generic import DetailView, FormView
-from django.shortcuts import get_object_or_404, redirect
 
 
 class EventView(DetailView):
@@ -56,8 +57,7 @@ class RegistrationFormView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.event = get_object_or_404(Event, pk=kwargs["pk"])
-        self.success_url = f"/events/{self.event.pk}/"
-        #TODO look into get_absolute_url
+        self.success_url = self.event.get_absolute_url()
 
         if self.event.has_form_fields:
             return super().dispatch(request, *args, **kwargs)

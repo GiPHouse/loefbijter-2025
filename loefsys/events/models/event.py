@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel, TitleSlugDescriptionModel
@@ -152,10 +153,34 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
                 name="event_end_gt_start",
                 violation_error_message="End time cannot be before the start time.",
             ),
+            CheckConstraint(
+                condition=Q(start__gt=F("registration_deadline")),
+                name="event_start_gt_reg_end",
+                violation_error_message="registration deadline can't be after start.",
+            ),
+            CheckConstraint(
+                condition=Q(start__gt=F("cancelation_deadline")),
+                name="event_start_gt_can_end",
+                violation_error_message="cancelation deadline can't be after start.",
+            ),
+            CheckConstraint(
+                condition=Q(registration_deadline__gt=F("registration_start")),
+                name="reg_end_gt_reg_start",
+                violation_error_message="start of registration can't be after the end.",
+            ),
+            CheckConstraint(
+                condition=Q(cancelation_deadline__gt=F("registration_start")),
+                name="can_end_gt_reg_start",
+                violation_error_message="cancelation can't be before registration opens"
+            ),
         )
 
     def __str__(self):
         return f"{self.title}"
+
+    def get_absolute_url(self):
+        """Return the detail page url for this registration."""
+        return reverse("events:event", kwargs={"pk": self.pk})
 
     def mandatory_registration(self) -> bool:
         """Check whether this event has mandatory registration.
