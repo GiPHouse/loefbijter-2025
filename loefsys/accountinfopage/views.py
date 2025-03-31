@@ -11,7 +11,7 @@ from . import forms
 def get_account_info(request):
     """Get account information from request."""
     user_info = {
-        "name": request.user.display_name,
+        "name": request.user.display_name.strip(),
         "email": request.user.email,
         "phone_number": request.user.phone_number,
         "picture": "",
@@ -45,19 +45,24 @@ def accountinfoedit(request):
         user_form = forms.EditUserInfo(
             request.POST, request.FILES, instance=request.user
         )
-        member_form = forms.EditMemberInfo(
-            request.POST,
-            request.FILES,
-            instance=MemberDetails.objects.filter(user=request.user)[0],
+        member_list = MemberDetails.objects.filter(user=request.user)
+        member_form = (
+            forms.EditMemberInfo(request.POST, request.FILES, instance=member_list[0])
+            if member_list.count() > 0
+            else None
         )
-        if user_form.is_valid() and member_form.is_valid():
+        if user_form.is_valid() and (member_form is None or member_form.is_valid()):
             user_form.save()
-            member_form.save()
+            if member_form is not None:
+                member_form.save()
             return redirect("accountinfo")
     else:
         user_form = forms.EditUserInfo(instance=request.user)
-        member_form = forms.EditMemberInfo(
-            instance=MemberDetails.objects.filter(user=request.user)[0]
+        member_list = MemberDetails.objects.filter(user=request.user)
+        member_form = (
+            forms.EditMemberInfo(instance=member_list[0])
+            if member_list.count() > 0
+            else None
         )
 
     return render(

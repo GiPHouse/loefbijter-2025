@@ -17,10 +17,12 @@
             <h2>User details</h2>
             {{ user_form.as_p }}
         </div>
+        {% if member_form %}
         <div class="flex flex-col grow" id="member-information">
             <h2>Member details</h2>
             {{ member_form.as_p }}
         </div>
+        {% endif %}
     </div>
     <button>Save account information</button>
 </form>
