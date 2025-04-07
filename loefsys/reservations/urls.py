@@ -6,10 +6,12 @@ from .views import (
     ReservationCreateView,
     ReservationDeleteView,
     ReservationDetailView,
+    ReservationListView,
     ReservationUpdateView,
 )
 
 urlpatterns = [
+    path("", ReservationListView.as_view(), name="reservations"),
     path("add/", ReservationCreateView.as_view(), name="reservation-add"),
     path("update/<int:pk>", ReservationUpdateView.as_view(), name="reservation-update"),
     path("delete/<int:pk>", ReservationDeleteView.as_view(), name="reservation-delete"),
