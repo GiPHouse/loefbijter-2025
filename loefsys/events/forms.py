@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import RegistrationFormField
 
+
 class EventFieldsForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
