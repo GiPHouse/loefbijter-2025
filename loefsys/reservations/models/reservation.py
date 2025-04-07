@@ -90,7 +90,8 @@ class Reservation(models.Model):
         """
         try:
             Reservation.objects.get(
-                Q(reserved_item=self.reserved_item)
+                ~Q(pk=self.pk)
+                & Q(reserved_item=self.reserved_item)
                 & (
                     Q(start__range=(self.start, self.end))
                     | Q(end__range=(self.start, self.end))

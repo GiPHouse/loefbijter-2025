@@ -14,6 +14,10 @@ class ReservationListView(LoginRequiredMixin, ListView):
 
     model = Reservation
 
+    def get_queryset(self):
+        """Only show instances of Reservation made by the user."""
+        return Reservation.objects.filter(reservee_user=self.request.user)
+
 
 class ReservationCreateView(LoginRequiredMixin, CreateView):
     """Reservation create view."""
@@ -22,7 +26,7 @@ class ReservationCreateView(LoginRequiredMixin, CreateView):
     form_class = CreateReservationForm
 
     def form_valid(self, form):
-        """Add the user who made the reservation to the reservation instance."""
+        """Add the user who made the reservation to the Reservation instance."""
         form.instance.reservee_user = self.request.user
         return super().form_valid(form)
 
@@ -32,6 +36,10 @@ class ReservationUpdateView(LoginRequiredMixin, UpdateView):
 
     model = Reservation
     fields = ("reserved_item", "start", "end")
+
+    def get_queryset(self):
+        """Only show instances of Reservation made by the user."""
+        return Reservation.objects.filter(reservee_user=self.request.user)
 
 
 class ReservationDeleteView(LoginRequiredMixin, DeleteView):
@@ -44,3 +52,7 @@ class ReservationDetailView(LoginRequiredMixin, DetailView):
     """Reservation detail view."""
 
     model = Reservation
+
+    def get_queryset(self):
+        """Only show instances of Reservation made by the user."""
+        return Reservation.objects.filter(reservee_user=self.request.user)
