@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from loefsys.reservations.models.reservable import ReservableItem
+from loefsys.users.models.user import User
 
 
 class Reservation(models.Model):
@@ -42,6 +43,10 @@ class Reservation(models.Model):
     reserved_item = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
     # reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
     # reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
+    reservee_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # TODO reservee_user is a temporary field which should be replaced
+    # by the fields reservee_member and reservee_group once the WebCie
+    # has added Member to the admin page.
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
@@ -61,16 +66,12 @@ class Reservation(models.Model):
             ),
             # CheckConstraint(
             #     condition=(
-            #         Q(reservee_member__isnull=True) &
-            #         Q(reservee_group__isnotnull=True)
+            #         Q(reservee_member__isnull=True) & Q(reservee_group__isnull=False)
             #     )
-            #     | (
-            #         Q(reservee_member__isnotnull=True) &
-            #         Q(reservee_group__isnull=True)
-            #     ),
+            #     | (Q(reservee_member__isnull=False) & Q(reservee_group__isnull=True)),
             #     name="member_or_group",
             #     violation_error_message="Only a group or a member can make reservation, not both.",  # noqa: E501
-            # ), #TODO create tests for this
+            # ),  # TODO create tests for this
         )
 
     def __str__(self) -> str:
