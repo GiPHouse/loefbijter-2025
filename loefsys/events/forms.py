@@ -33,5 +33,5 @@ class EventFieldsForm(forms.Form):
         return super().is_valid()
 
     def field_values(self):
-        for key in self.form_fields.items():
-            yield key, self.cleaned_data.get(key)
+        for key in self.fields:
+            yield key

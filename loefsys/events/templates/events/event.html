@@ -11,6 +11,10 @@
             <p>{{ event.price }}</p>
             <p>{{ event.capacity }}</p>
             <p>{{ event.image }}</p>
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="submit" value="Register" class="btn btn-primary">
+            </form>
         </div>
     </div>
 </div>

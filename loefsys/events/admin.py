@@ -8,7 +8,7 @@ from typing import ClassVar
 from django.contrib import admin
 
 from .models import Event, EventOrganizer, EventRegistration
-from .models.registration_form_field import RegistrationFormField
+from .models.registration_form_field import RegistrationFormField, RegistrationFormFieldResponse
 
 
 class RegistrationFormInline(admin.TabularInline):
@@ -40,3 +40,11 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 @admin.register(RegistrationFormField)
 class RegistrationFormAdmin(admin.ModelAdmin):
     """Admin interface for managing registration form fields."""
+
+@admin.register(RegistrationFormFieldResponse)
+class RegistrationFormFieldResponseAdmin(admin.ModelAdmin):
+    """Admin interface for managing registration form field responses."""
+
+    list_display = ("registration", "field", "response")
+    search_fields = ("registration__event__title", "field__subject")
+    list_filter = ("registration__event__category", "field__type")
