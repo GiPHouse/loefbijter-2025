@@ -5,6 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
+from loefsys.reservations.forms import CreateReservationForm
 from loefsys.reservations.models.reservation import Reservation
 
 
@@ -18,7 +19,7 @@ class ReservationCreateView(LoginRequiredMixin, CreateView):
     """Reservation create view."""
 
     model = Reservation
-    fields = ("reserved_item", "start", "end")
+    form_class = CreateReservationForm
 
 
 class ReservationUpdateView(LoginRequiredMixin, UpdateView):
