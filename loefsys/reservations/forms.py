@@ -9,11 +9,17 @@ class CreateReservationForm(forms.ModelForm):
     """A form to create reservations."""
 
     reserved_item = forms.ModelChoiceField(queryset=ReservableItem.objects.all())
-    start = forms.DateField(
-        widget=forms.widgets.DateTimeInput(attrs={"type": "datetime-local"})
+    start = forms.DateTimeField(
+        input_formats=["%I:%M %p %d-%b-%Y"],
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"}, format="%I:%M %p %d-%b-%Y"
+        ),
     )
-    end = forms.DateField(
-        widget=forms.widgets.DateTimeInput(attrs={"type": "datetime-local"})
+    end = forms.DateTimeField(
+        input_formats=["%I:%M %p %d-%b-%Y"],
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"}, format="%I:%M %p %d-%b-%Y"
+        ),
     )
 
     class Meta:

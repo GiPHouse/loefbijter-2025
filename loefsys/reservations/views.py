@@ -21,6 +21,11 @@ class ReservationCreateView(LoginRequiredMixin, CreateView):
     model = Reservation
     form_class = CreateReservationForm
 
+    def form_valid(self, form):
+        """Add the user who made the reservation to the reservation instance."""
+        form.instance.reservee_user = self.request.user
+        return super().form_valid(form)
+
 
 class ReservationUpdateView(LoginRequiredMixin, UpdateView):
     """Reservation update view."""
