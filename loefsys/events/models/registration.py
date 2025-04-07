@@ -68,7 +68,7 @@ class EventRegistration(TimeStampedModel):
         db_persist=True,
     )
     costs_paid = models.DecimalField(
-        max_digits=5, decimal_places=2, verbose_name=_("Costs paid")
+        max_digits=5, decimal_places=2, verbose_name=_("Costs paid"), blank=True
     )
 
     objects = EventRegistrationManager()
@@ -92,7 +92,7 @@ class EventRegistration(TimeStampedModel):
         if self._state.adding:
             self.status = (
                 RegistrationStatus.QUEUED
-                if self.event.max_capacity_reached()
+                if self.event.max_capacity_reached() and self.event.capacity
                 else RegistrationStatus.ACTIVE
             )
             self.price_at_registration = self.event.price

@@ -45,6 +45,6 @@ class RegistrationFormField(models.Model):
 
     def __str__(self):
         return self.subject
-    
+
     class Meta:
         order_with_respect_to = "event"

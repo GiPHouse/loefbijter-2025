@@ -214,7 +214,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         """
         return (
             self.capacity is not None
-            and self.capacity <= self.event.eventregistration_set.active().count()
+            and self.capacity <= self.eventregistration_set.active().count()
         )
 
     def fine_on_cancellation(self) -> bool:

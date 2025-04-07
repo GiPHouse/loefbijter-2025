@@ -2,20 +2,29 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView, FormView
 
 from .forms import EventFieldsForm
-from .models import Event, RegistrationFormField
+from .models import Event, EventRegistration, RegistrationFormField
 
 
 class EventView(DetailView):
     model = Event
     template_name = "events/event.html"
+    event = None
 
     def get_object(self, queryset=None):
         if "pk" in self.kwargs:
             return get_object_or_404(Event, pk=self.kwargs["pk"])
         return get_object_or_404(Event, slug=self.kwargs["slug"])
 
-    # TODO: Register button should create registration before redirect!
+    def post(self, request, *args, **kwargs):
+        """Handle registration creation from the Register button on Event page."""
+        event = self.get_object()
 
+        registration = EventRegistration(event=event, costs_paid=0.00)
+        registration.save()
+
+        if event.has_form_fields:
+            return redirect("events:registration", pk=event.pk)
+        return redirect(event)
 
 class RegistrationFormView(FormView):
     template_name = "events/registration_form.html"

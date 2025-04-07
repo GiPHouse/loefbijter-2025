@@ -10,7 +10,14 @@
             <p>{{ event.location }}</p>
             <p>{{ event.price }}</p>
             <p>{{ event.capacity }}</p>
-            <p>{{ event.image }}</p>
+            <p><img src="{{ event.image.url }}" alt="{{ event.title }}" class="img-fluid" /></p>
+
+            <!-- Register Button Form -->
+            <form method="post" action="">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+
         </div>
     </div>
 </div>
