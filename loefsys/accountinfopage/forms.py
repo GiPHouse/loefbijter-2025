@@ -10,7 +10,7 @@ class EditUserInfo(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ("phone_number", "nickname", "display_name_preference")
+        fields = ("phone_number", "nickname", "display_name_preference", "picture")
 
 
 class EditMemberInfo(forms.ModelForm):

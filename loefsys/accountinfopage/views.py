@@ -14,7 +14,7 @@ def get_account_info(request):
         "name": request.user.display_name.strip(),
         "email": request.user.email,
         "phone_number": request.user.phone_number,
-        "picture": "",
+        "picture": request.user.picture,
         "activities": "",
         "groups": request.user.groups.all(),
     }
@@ -42,6 +42,7 @@ def get_account_info(request):
 def accountinfoedit(request):
     """View for editing accountinformation."""
     if request.method == "POST":
+        old_picture = request.user.picture
         user_form = forms.EditUserInfo(
             request.POST, request.FILES, instance=request.user
         )
@@ -52,6 +53,9 @@ def accountinfoedit(request):
             else None
         )
         if user_form.is_valid() and (member_form is None or member_form.is_valid()):
+            if not user_form.cleaned_data.get("picture") and old_picture:
+                # Delete the old profile picture from storage
+                old_picture.delete(save=False)
             user_form.save()
             if member_form is not None:
                 member_form.save()

@@ -13,10 +13,12 @@
 <div class="flex flex-row text-center" id="account-information">
     <div class="flex flex-col grow" id="personal-information">
         <h2>Personal details</h2>
+        <div>
+            <img class="m-auto w-24 h-24" src=" {% if user_info.picture %} {{ user_info.picture.url }}  {% else %} /media/default.jpg {% endif %}" alt="Profile Picture">
+        </div>
         {% include 'panel.html' with key='Name' value=user_info.name %}
         {% include 'panel.html' with key='Email address' value=user_info.email %}
         {% include 'panel.html' with key='Phone number' value=user_info.phone_number %}
-
         {% if user_info.groups.count != 0 %}
         <div>
             <h3>My groups</h3>
