@@ -3,6 +3,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
@@ -47,6 +48,21 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+class OverwriteStorage(FileSystemStorage):
+    """Custom storage class that overwrites files with the same name.
+
+    Needed because when a user uploads a new profile picture, the old
+    one would otherwise still be present together with the new one that
+    gets renamed.
+    """
+
+    def get_available_name(self, name, max_length=None):  # noqa: ARG002
+        """Given the desired name, derive and return a name that is available."""
+        if self.exists(name):
+            self.delete(name)
+        return name
+
+
 class User(AbstractBaseUser, PermissionsMixin, NameMixin, TimeStampedModel):
     """The user model for authentication on the Loefbijter website.
 
@@ -81,12 +97,26 @@ class User(AbstractBaseUser, PermissionsMixin, NameMixin, TimeStampedModel):
         For members, a phone number is required, and it is recommended for guest
         accounts too. However, it is possible that no phone number is available for
         ex-members, so the field should take into account empty values too.
+    picture : ~django.db.models.fields.files.ImageFieldFile
     note : str
         A note field that are only visible to active board members.
 
         For guest accounts, a note can provide information for which purpose this
         account exists. For members, incidents can potentially be tracked.
     """
+
+    def user_upload_directory(self):
+        """Return the user upload directory."""
+        return f"user_{self.id}"
+
+    def user_picture_upload_path(self, _):
+        """Return the upload path for the user profile picture."""
+        return self.user_upload_directory() + "/picture.jpg"
+
+    def delete_profile_picture(self):
+        """Delete the image file associated with the profile picture."""
+        if self.picture:
+            self.picture.delete(save=False)
 
     email = models.EmailField(unique=True)
     is_staff = models.BooleanField(
@@ -114,6 +144,12 @@ class User(AbstractBaseUser, PermissionsMixin, NameMixin, TimeStampedModel):
     )
 
     phone_number = PhoneNumberField(blank=True)
+    picture = models.ImageField(
+        upload_to=user_picture_upload_path,
+        null=True,
+        blank=True,
+        storage=OverwriteStorage(),
+    )
     note = models.TextField(blank=True)
 
     EMAIL_FIELD = "email"
