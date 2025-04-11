@@ -1,7 +1,13 @@
 """Module defining the tests for accountinfopage."""
 
+import io
+import os
+import shutil
 from datetime import date
 
+from PIL import Image
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 from django_dynamic_fixture import G
@@ -22,15 +28,34 @@ class EditAccountInformationTestCase(TestCase):
             password="secret1",
             phone_number="+31612345678",
             nickname="A",
+            picture=None,
         )
         self.member = G(
             MemberDetails, user=self.user, birthday=date(2004, 1, 1), show_birthday=True
         )
         self.membership = G(Membership, member=self.member, start=date(2024, 1, 1))
         self.edit_url = reverse("accountinfoedit")
+        self.upload_path = settings.MEDIA_ROOT / self.user.user_upload_directory()
+
+    def tearDown(self):
+        """Clean up method after tests are done."""
+        # Clean up the upload folder
+        if os.path.exists(self.upload_path):
+            shutil.rmtree(self.upload_path)
+
+    def create_image(self):
+        """Create a test image."""
+        # Create a small image in memory
+        image_file = io.BytesIO()
+        image = Image.new(
+            "RGB", (100, 100), color=(255, 0, 0)
+        )  # Create a red 100x100 image
+        image.save(image_file, format="JPEG")
+        image_file.seek(0)  # Move the pointer back to the beginning of the file
+        return image_file
 
     def test_valid_form_submitted(self):
-        """Test that when a valid form is submitted.
+        """Test for when a valid form is submitted.
 
         The data should be changed.
         """
@@ -51,7 +76,7 @@ class EditAccountInformationTestCase(TestCase):
         self.assertContains(response=response, text="2003-01-01")
 
     def test_invalid_form_submitted(self):
-        """Test that when an invalid form is submitted.
+        """Test for when an invalid form is submitted.
 
         The data should not be changed (user form is incorrect, member form is okay).
         """
@@ -74,7 +99,7 @@ class EditAccountInformationTestCase(TestCase):
         self.assertContains(response=response, text="2004-01-01")
 
     def test_invalid_form_submitted_2(self):
-        """Test that when an invalid form is submitted.
+        """Test for when an invalid form is submitted.
 
         The data should not be changed (user form is okay, member form is incorrect).
         """
@@ -94,6 +119,49 @@ class EditAccountInformationTestCase(TestCase):
         self.assertContains(response=response, text="+31612345678")
         self.assertNotContains(response=response, text="2003-01-01")
         self.assertContains(response=response, text="2004-01-01")
+
+    def test_user_picture(self):
+        """Test for when the profile picture is updated and cleared.
+
+        Check that when the picture is updated, the new picture is displayed
+        instead of the default picture, and when the picture is cleared, the
+        default picture is displayed again.
+        """
+        self.client.force_login(user=self.user)
+        response = self.client.get("/account/")
+        self.assertContains(response=response, text="default.jpg")
+        image_file = self.create_image()
+        image = SimpleUploadedFile(
+            name="picture.jpg", content=image_file.read(), content_type="image/jpeg"
+        )
+        form_data = {
+            "phone_number": self.user.phone_number,
+            "nickname": self.user.nickname,
+            "display_name_preference": self.user.display_name_preference,
+            "birthday": self.member.birthday,
+            "show_birthday": self.member.show_birthday,
+            "gender": self.member.gender,
+            "picture": image,
+        }
+        response = self.client.post(reverse("accountinfoedit"), data=form_data)
+        self.assertEqual(response.status_code, 302)  # expect redirect to account page
+        response = self.client.get("/account/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response=response, text="picture.jpg")
+        form_data = {
+            "phone_number": self.user.phone_number,
+            "nickname": self.user.nickname,
+            "display_name_preference": self.user.display_name_preference,
+            "birthday": self.member.birthday,
+            "show_birthday": self.member.show_birthday,
+            "gender": self.member.gender,
+            "picture-clear": "on",
+        }
+        response = self.client.post(reverse("accountinfoedit"), data=form_data)
+        self.assertEqual(response.status_code, 302)  # expect redirect to account page
+        response = self.client.get("/account/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response=response, text="default.jpg")
 
 
 class UserTestCase(TestCase):

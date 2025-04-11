@@ -105,6 +105,10 @@ class User(AbstractBaseUser, PermissionsMixin, NameMixin, TimeStampedModel):
         account exists. For members, incidents can potentially be tracked.
     """
 
+    def user_upload_directory(self):
+        """Return the user upload directory."""
+        return f"user_{self.id}"
+
     def delete_profile_picture(self):
         """Delete the image file associated with the profile picture."""
         if self.picture:
@@ -137,7 +141,7 @@ class User(AbstractBaseUser, PermissionsMixin, NameMixin, TimeStampedModel):
 
     phone_number = PhoneNumberField(blank=True)
     picture = models.ImageField(
-        upload_to=(lambda instance, _: f"user_{instance.id}/picture.jpg"),
+        upload_to=(lambda self, _: self.user_upload_directory() + "/picture.jpg"),
         null=True,
         blank=True,
         storage=OverwriteStorage(),
