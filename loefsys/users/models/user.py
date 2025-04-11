@@ -109,6 +109,10 @@ class User(AbstractBaseUser, PermissionsMixin, NameMixin, TimeStampedModel):
         """Return the user upload directory."""
         return f"user_{self.id}"
 
+    def user_picture_upload_path(self, _):
+        """Return the upload path for the user profile picture."""
+        return self.user_upload_directory() + "/picture.jpg"
+
     def delete_profile_picture(self):
         """Delete the image file associated with the profile picture."""
         if self.picture:
@@ -141,7 +145,7 @@ class User(AbstractBaseUser, PermissionsMixin, NameMixin, TimeStampedModel):
 
     phone_number = PhoneNumberField(blank=True)
     picture = models.ImageField(
-        upload_to=(lambda self, _: self.user_upload_directory() + "/picture.jpg"),
+        upload_to=user_picture_upload_path,
         null=True,
         blank=True,
         storage=OverwriteStorage(),
