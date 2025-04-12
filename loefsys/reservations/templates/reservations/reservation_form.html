@@ -1,6 +1,72 @@
 {% extends "master.html" %}
 
 {% block title %}
+    Bewerk Reservering
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-screen">
+    <section id="Edit Reservation Form" class="bg-[#234193] p-8 flex flex-col">
+        <form method="post" class="bg-white p-8 rounded-3xl shadow-lg w-4/5 mx-auto space-y-6 text-left">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+    
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-2xl font-bold mb-2">
+                        {{ field.label }}:
+                    </label>
+                    <div class="text-xl">{{ field }}</div>
+                    {% if field.help_text %}
+                        <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </form>
+    </section>
+
+    <!-- Submit or Cancel -->
+    <section id="submit reservation" class="bg-[#1BB1E6] flex-auto p-8">
+        <h1 class="text-5xl font-bold"> RESERVERING INDIENEN </h1>
+        <form method="post" class="w-4/5 mx-auto">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary p-2 border-2 rounded-3xl shadow-lg w-full bg-gray-200 hover:bg-gray-400 block text-center">
+                <span class="font-bold text-3xl">Reservering Indienen</span>
+            </button>
+        </form>
+        <a href="{% url 'reservations' %}" class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-gray-200 hover:bg-gray-400 block text-center">
+            <span class="font-bold text-3xl"> Anuleer </span>
+        </a>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <div class="w-full bottom-[0] bg-[#234193] grid grid-cols-4 items-center">
+        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
+            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
+            Profiel
+        </button>
+        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
+            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
+            Activiteiten
+        </button>
+        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
+            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
+            Reserveringen
+        </button>
+        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
+            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
+            Meer
+        </button>
+    </div>
+
+{% endblock %}
+
+{% comment %} {% extends "master.html" %}
+
+{% block title %}
     Reservations - Loefbijter
 {% endblock %}
 
@@ -10,4 +76,4 @@
     {{form.as_p}}
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-{% endblock %}
+{% endblock %} {% endcomment %}
