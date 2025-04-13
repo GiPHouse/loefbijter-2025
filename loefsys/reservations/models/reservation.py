@@ -34,6 +34,8 @@ class Reservation(models.Model):
         The person reserving the item, is null if a group is reserving the item.
     reservee_group : ~loefsys.groups.models.group.LoefBijterGroup
         The group reserving the item, is null if a person is reserving the item.
+    authorized_skipper : ~loefsys.users.models.user.User
+        The person who is the authorized skipper for a boat.
     start : ~datetime.datetime
         The start timestamp of the reservation.
     end : ~datetime.datetime
@@ -43,10 +45,19 @@ class Reservation(models.Model):
     reserved_item = models.ForeignKey(ReservableItem, on_delete=models.CASCADE)
     # reservee_member = models.ForeignKey(MemberDetails, on_delete=models.CASCADE)
     # reservee_group = models.ForeignKey(LoefbijterGroup, on_delete=models.CASCADE)
-    reservee_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    reservee_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="reservee_user_reservation_set"
+    )
     # TODO reservee_user is a temporary field which should be replaced
     # by the fields reservee_member and reservee_group once the WebCie
-    # has added Member to the admin page.
+    # has added Member(ship) to the admin page.
+    authorized_skipper = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="authorized_skipper_reservation_set",
+    )
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
