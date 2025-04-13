@@ -32,20 +32,6 @@
             </span>
         </a>
     </section>
-    <div class="w-full bottom-[0] bg-[#234193] grid grid-cols-4 items-center">
-        <a href="{% url 'reservation-add' %}" class="p-4 text-2xl text-white hover:bg-[#012071] text-center">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Profiel
-        </a>
-        <button href="" class="p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Activiteiten</button>
-        <button href="" class="p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Reserveringen</button>
-        <button href="" class="p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Meer</button>
-      </div>
+    {% include "menu.html" %}
 </div>
 {% endblock %}

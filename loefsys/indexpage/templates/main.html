@@ -39,23 +39,6 @@ Home - Loefbijter
                 </div>
             </div>
     </section>
-    <div class="w-full bottom-[0] bg-[#234193] grid grid-cols-4 items-center">
-        <a href="" class="btn btn-primary p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Profiel
-        </a>
-        <a href="" class="btn btn-primary p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Activiteiten
-        </a>
-        <a href="{% url 'reservations' %}" class="btn btn-primary p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Reserveringen
-        </a>
-        <a href="" class="btn btn-primary p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Meer
-        </a>
-    </div>
+    {% include "menu.html" %}
 </div>
 {% endblock %}

@@ -30,10 +30,10 @@
                     <span class="font-bold">Type:</span> {{ reservation.reserved_item.reservable_type.name }}
                 </div>
             </div>
-            
+
         </div>
     </section>
-    
+
     <!-- Edit Reservation Zonder Kleur-->
     <section id="delete reservation" class="bg-[#1BB1E6] flex-auto p-8">
         <h1 class="text-5xl font-bold">BEWERK RESERVERING</h1>
@@ -47,29 +47,9 @@
                 Verwijder Reservering
             </span>
         </a>
-    
+
     </section>
-    
-    <!-- Bottom Navigation -->
-    <div class="w-full bottom-[0] bg-[#234193] grid grid-cols-4 items-center">
-        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Profiel
-        </button>
-        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Activiteiten
-        </button>
-        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Reserveringen
-        </button>
-        <button class="p-4 text-2xl text-white hover:bg-[#012071]">
-            <img class="mx-auto max-w-[3rem] h-auto" src="https://eveks.nl/4432-home_default/test.jpg">
-            Meer
-        </button>
-    </div>
-</div>
+    {% include "menu.html" %}
 {% endblock %}
 
 
@@ -77,7 +57,7 @@
 
 
 
-{% comment %} 
+{% comment %}
  What do we want to display:
 Name object, Description object, Reservable type, Location, (Reservable), Capacity, (Boat has engine), Boat provider, Start time - End time - Duration of reservation,Who reserved it, delete / edit reservation, (photo of boat)
 {% endcomment %}
