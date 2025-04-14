@@ -30,7 +30,7 @@ In order to contribute to the project, you should have the following prerequisit
 
     $ tailwindcss -i loefsys/indexpage/static/input.css -o loefsys/indexpage/static/output.css --watch
 
-#. Finally, you can start the development server with::
+#. Finally, you can start the development server in a new terminal with::
 
     $ uv run manage.py runserver
 
