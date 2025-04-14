@@ -171,7 +171,7 @@ class UserTestCase(TestCase):
         """Set up user without groups and user with groups."""
         self.client = Client()
         self.user1 = G(
-            User, email="user@user.nl", password="secret1", phone_number="0612345678"
+            User, email="user@user.nl", password="secret1", phone_number="+31612345678"
         )
 
         self.group1 = G(
@@ -192,29 +192,38 @@ class UserTestCase(TestCase):
             User,
             email="user2@user2.nl",
             password="secret2",
-            phone_number="0612345678",
+            phone_number="+31612345678",
             groups=[self.group1, self.group2],
         )
 
     def not_logged_in(self):
-        """Test that not logged in users are redirected to the signup page."""
+        """Test for when a user is not logged in.
+
+        The user should be redirected to the signup page.
+        """
         response = self.client.get("/account/")
         self.assertRedirects(
             response=response, expected_url="/signup/", status_code=301
         )
 
     def test_user_without_groups(self):
-        """Test that all user information is displayed, apart from groups when there are none."""  # noqa: E501
+        """Test for when a user is not part of any groups.
+
+        All user information should be displayed, apart from groups.
+        """
         self.client.force_login(user=self.user1)
         response = self.client.get("/account/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response=response, text="user@user.nl")
-        self.assertContains(response=response, text="0612345678")
+        self.assertContains(response=response, text="+31612345678")
         self.assertNotContains(response=response, text="Member")
         self.assertNotContains(response=response, text="My groups")
 
     def test_user_with_groups(self):
-        """Test that groups are displayed when user has groups."""
+        """Test for when a user is a part of groups.
+
+        All the groups should be displayed.
+        """
         self.client.force_login(user=self.user2)
         response = self.client.get("/account/")
         self.assertContains(response=response, text="My groups")
@@ -230,27 +239,36 @@ class MemberTestCase(TestCase):
     def setUp(self):
         """Set up member."""
         self.user = G(
-            User, email="member@member.nl", password="secret", phone_number="0687654321"
+            User,
+            email="member@member.nl",
+            password="secret",
+            phone_number="+31687654321",
         )
         self.member = G(
             MemberDetails, user=self.user, birthday=date(2004, 1, 1), show_birthday=True
         )
 
     def test_member(self):
-        """Test that all member information is displayed."""
+        """Test for when a user is a member.
+
+        All member information should be displayed.
+        """
         G(Membership, member=self.member, start=date(2024, 1, 1))
 
         self.client.force_login(user=self.user)
         response = self.client.get("/account/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response=response, text="member@member.nl")
-        self.assertContains(response=response, text="0687654321")
+        self.assertContains(response=response, text="+31687654321")
         self.assertContains(response=response, text="Member")
         self.assertContains(response=response, text="2004-01-01")
         self.assertContains(response=response, text="2024-01-01")
 
     def test_member_without_membership(self):
-        """Test that an exception is raised when a member has no membership."""
+        """Test for when a member has no membership.
+
+        An exception should be raised.
+        """
         self.client.force_login(user=self.user)
         with self.assertRaises(
             expected_exception=Exception, msg="Member has no membership"
@@ -258,7 +276,10 @@ class MemberTestCase(TestCase):
             self.client.get("/account/")
 
     def test_member_with_multiple_memberships(self):
-        """Test that the latest membership information gets displayed when there are multiple memberships."""  # noqa: E501
+        """Test for when a member has multiple memberships.
+
+        The latest membership information should be displayed.
+        """
         G(Membership, member=self.member, start=date(2022, 1, 1))
         G(Membership, member=self.member, start=date(2023, 1, 1))
 
