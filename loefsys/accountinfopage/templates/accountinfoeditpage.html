@@ -1,11 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% block title %}Edit account information{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'output.css' %}">
-</head>
-<body>
+{% extends "master.html" %}
+
+{% block title %}
+Edit account information
+{% endblock %}
 
 {% block content %}
 <h1>Account information</h1>
@@ -28,6 +25,3 @@
 </form>
 
 {% endblock %}
-
-</body>
-</html>
