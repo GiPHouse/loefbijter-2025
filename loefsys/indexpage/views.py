@@ -1,6 +1,10 @@
 """Module defining the view for the index page."""
 
+from datetime import datetime
+
 from django.shortcuts import render
+
+from loefsys.events.models import Event
 
 
 def main(request):
@@ -15,4 +19,11 @@ def main(request):
             "text": "Het zeilseizoen gaat weer van start",
         },
     ]
-    return render(request, "main.html", {"announcements": announcements})
+    events = Event.objects.all().filter(start__gte=datetime.now()).order_by("start")
+    if request.user.is_active:
+        events = events[:2]
+    else:
+        events = events.filter(published=True)[:2]
+    return render(
+        request, "main.html", {"announcements": announcements, "events": events}
+    )
