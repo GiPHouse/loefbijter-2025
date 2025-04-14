@@ -38,6 +38,9 @@ class EventCategories(models.IntegerChoices):
     SAILING = (5, _("Sailing"))
     """Used for events directly involving sailing."""
 
+    TRAINING = (6, _("Training"))
+    """Used for events meant to train a participant"""
+
 
 class RegistrationStatus(models.IntegerChoices):
     """The various statuses for the registration."""
