@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html>
-<header>Login page</header>
+{% extends "master.html" %}
 
-<body>
-    <label for="email">Email address:</label>
-    <input type="text" id="email" name="email">
+{% block title %}
+Login page
+{% endblock %}
 
-    <label for="email">Email address:</label>
-    <input type="text" id="email" name="email">
-</body>
-</html>
+{% block content %}
+<label for="email">Email address:</label>
+<input type="text" id="email" name="email">
+
+<label for="email">Email address:</label>
+<input type="text" id="email" name="email">
+{% endblock %}

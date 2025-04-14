@@ -1,0 +1,37 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Reservering
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-screen">
+    <section id="reservations" class="bg-[#234193] p-8 flex flex-col">
+        <h1 class="text-6xl font-bold text-white pb-8 mt-4">MIJN RESERVERINGEN</h1>
+        {% for reservation in reservations %}
+            <a href="{% url 'reservation-detail' pk=reservation.id %}" class="btn btn-primary p-4 border-2 border-red-500 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-white hover:bg-gray-300 text-left">
+                <span class="font-bold text-3xl">
+                    <span class="font-bold text-5xl">
+                        {{ reservation }}
+                        <br/>
+                    </span>
+                    <span class="text-4xl">
+                        Starttijd: {{ reservation.start }}
+                        <br/>
+                        Eindtijd: {{ reservation.end }}
+                    </span>
+                </span>
+            </a>
+        {% endfor %}
+    </section>
+    <section id="create reservation" class="bg-[#1BB1E6] flex-auto p-8">
+        <h1 class="text-5xl font-bold">MAAK NIEUWE RESERVERING</h1>
+        <a href="{% url 'reservation-add'%}" class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-gray-200 hover:bg-gray-400 block text-center">
+            <span class="font-bold text-3xl">
+                Maak reservering
+            </span>
+        </a>
+    </section>
+    {% include "menu.html" %}
+</div>
+{% endblock %}

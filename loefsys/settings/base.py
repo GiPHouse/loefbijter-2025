@@ -28,6 +28,9 @@ class BaseSettings(ClassySettings):
 
     STATIC_URL = "static/"
 
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+
     @denv
     def SECRET_KEY(self) -> str:  # noqa N802 D102
         raise ValueError("Environment variable DJANGO_SECRET_KEY must be set.")
@@ -49,6 +52,7 @@ class BaseSettings(ClassySettings):
             "loefsys.users",
             "loefsys.indexpage",
             "loefsys.profile",
+            "loefsys.accountinfopage",
         )
 
     def INSTALLED_APPS(self) -> Sequence[str]:  # noqa N802 D102

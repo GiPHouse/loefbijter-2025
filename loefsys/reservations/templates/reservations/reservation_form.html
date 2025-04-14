@@ -1,12 +1,45 @@
-<!-- {% extends "master.html" %}
+{% extends "master.html" %}
 
 {% block title %}
-    Home - Loefbijter
-{% endblock %} -->
+    Bewerk reservering
+{% endblock %}
 
 {% block content %}
-<form method="post">{% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="Submit">
-</form>
+<div class="flex flex-col h-screen">
+    <section class="bg-[#234193] p-8 flex flex-col">
+        <form id="reservationform" method="post" class="bg-white p-8 rounded-3xl shadow-lg w-4/5 mx-auto space-y-6 text-left">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-2xl font-bold mb-2">
+                        {{ field.label }}:
+                    </label>
+                    <div class="text-xl">{{ field }}</div>
+                    {% if field.help_text %}
+                        <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </form>
+    </section>
+
+    <!-- Submit or Cancel -->
+    <section id="submit reservation" class="bg-[#1BB1E6] flex-auto p-8">
+        <h1 class="text-5xl font-bold">RESERVERING INDIENEN </h1>
+        <form method="post" class="w-4/5 mx-auto">
+            {% csrf_token %}
+            <button type="submit" form="reservationform" class="btn btn-primary p-2 border-2 rounded-3xl shadow-lg w-full bg-gray-200 hover:bg-gray-400 block text-center">
+                <span class="font-bold text-3xl">Reservering Indienen</span>
+            </button>
+        </form>
+        <a href="{% url 'reservations' %}" class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-gray-200 hover:bg-gray-400 block text-center">
+            <span class="font-bold text-3xl">Annuleer</span>
+        </a>
+    </section>
+    {% include "menu.html" %}
 {% endblock %}
