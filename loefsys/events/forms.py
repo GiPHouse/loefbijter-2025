@@ -15,7 +15,7 @@ class EventFieldsForm(forms.Form):
             match field["type"]:
                 case RegistrationFormField.BOOLEAN_FIELD:
                     self.fields[key] = forms.BooleanField(required=False)
-                case RegistrationFormField.INTERGER_FIELD:
+                case RegistrationFormField.INTEGER_FIELD:
                     self.fields[key] = forms.IntegerField(required=field["required"])
                 case RegistrationFormField.DATETIME_FIELD:
                     self.fields[key] = forms.DateTimeField(required=field["required"])
@@ -29,10 +29,7 @@ class EventFieldsForm(forms.Form):
             self.fields[key].help_text = field["description"]
             self.fields[key].initial = field["default"]
 
-    def is_valid(self):
-        return True #TODO recouple to registration
-        return super().is_valid()
-
     def field_values(self):
-        for key in self.fields:
-            yield key
+        print("cleaned_data", self.cleaned_data)
+        for pk, _ in self.form_fields:
+            yield pk, self.data[str(pk)] #TODO Might need to be cleaned data?

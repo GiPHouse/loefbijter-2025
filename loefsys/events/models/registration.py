@@ -71,6 +71,14 @@ class EventRegistration(TimeStampedModel):
         max_digits=5, decimal_places=2, verbose_name=_("Costs paid"), blank=True
     )
 
+    @property
+    def form_fields(self):
+        fields = self.event.registrationformfield_set.all()
+        print(f"Fields: {fields}")
+        return [
+            (field, field.get_value_for(self)) for field in fields
+        ]
+
     objects = EventRegistrationManager()
 
     class Meta:

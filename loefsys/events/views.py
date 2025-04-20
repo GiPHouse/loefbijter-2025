@@ -1,11 +1,11 @@
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, FormView
 
-
+from .exceptions import RegistrationError
 from .forms import EventFieldsForm
-from .models import Event, RegistrationFormField, EventRegistration, RegistrationFormFieldResponse
-
+from .models import Event, EventRegistration, RegistrationFormField
 
 
 class EventView(DetailView):
@@ -22,7 +22,6 @@ class EventView(DetailView):
         """Handle the post request for the event view."""
         event = self.get_object()
 
-        #TODO create registration object
         try:
             register = EventRegistration(event=event,
                                          contact=request.user,
@@ -35,7 +34,7 @@ class EventView(DetailView):
             print("Registration already exists")
 
         if event.has_form_fields:
-            return redirect("events:registration", pk=event.pk)
+            return redirect("events:registration", slug=event.slug)
         return redirect(event)
 
 
@@ -45,10 +44,28 @@ class RegistrationFormView(FormView):
     event = None
     success_url = None
 
+    def __get_registration(self, event, contact):
+        """Get the registration for the event and contact."""
+        try:
+            registration = EventRegistration.objects.get(
+                event=event,
+                contact=contact
+            )
+        except EventRegistration.DoesNotExist as error:
+            raise RegistrationError(
+                _("You are not registered for this event.")
+            ) from error
+        except EventRegistration.MultipleObjectsReturned as error:
+            raise RegistrationError(
+                _("Unable to find the right registration.")
+            ) from error
+
+        return registration
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        event = Event.objects.get(pk=self.kwargs["pk"])
-        form_fields = RegistrationFormField.objects.filter(event=event)
+        contact = self.request.user
+        registration = self.__get_registration(self.event, contact)
 
         kwargs["form_fields"] = [
             (field.pk, {
@@ -56,49 +73,32 @@ class RegistrationFormView(FormView):
                 "type": field.type,
                 "description": field.description,
                 "required": field.required,
-                "default": field.default
-            }) for field in form_fields
+                "default": field.default,
+                "value": value
+            }) for field, value in registration.form_fields
         ]
+
+        print("RegistrationFormView KWARGS:", kwargs["form_fields"])
 
         return kwargs
 
-    # def post(self, request, *args, **kwargs):
-    #     _post = super().post(request, *args, **kwargs)
-    #     return _post
 
     def form_valid(self, form):
         values = form.field_values()
-        registration = EventRegistration.objects.get(event=self.event, contact=self.request.user)
-        try:
-            for value in values:
-                response = RegistrationFormFieldResponse(
-                    field=RegistrationFormField.objects.get(pk=value),
-                    registration=registration,
-                    response=value
-                )
-                response.save()
-            # for field in values:
-            #     response = RegistrationFormFieldResponse(
-            #         field=field,
-            #         registration=registration,
-            #         response=values[field]
-            #     )
-        except IntegrityError:
-            # TODO handle the error
-            print("Response already exists")
+        registration = self.__get_registration(self.event, self.request.user)
 
-        # validate values
-        # update registration
-        # success message
-        # return redirect(self.event)
-        # redirect back to event page
+        for field_id, field_value in values:
+            print("field_id", field_id)
+            print("field_value", field_value)
+            field = RegistrationFormField.objects.get(id=field_id)
+            field.set_value_for(registration, field_value)
+
         return super().form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        self.event = get_object_or_404(Event, pk=kwargs["pk"])
+        self.event = get_object_or_404(Event, slug=self.kwargs["slug"])
         self.success_url = self.event.get_absolute_url()
-        print("i was executed")
         if self.event.has_form_fields:
             return super().dispatch(request, *args, **kwargs)
 
-        return redirect(self.event)
+        return redirect(self.success_url)
