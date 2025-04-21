@@ -48,6 +48,7 @@ class RegistrationFormField(models.Model):
 
     @property
     def default(self):
+        """Get default value for registration form field based on its type."""
         match self.type:
             case self.BOOLEAN_FIELD:
                 return False
@@ -70,6 +71,7 @@ class RegistrationFormField(models.Model):
                 return self.datetimeregistrationinformation_set
 
     def get_value_for(self, registration):
+        """Get value for registration form field based on registration."""
         value_set = self.__get_field_set()
 
         try:
@@ -83,7 +85,11 @@ class RegistrationFormField(models.Model):
             return None
 
     def set_value_for(self, registration, value):
+        """Set value for registration form field based on registration and value."""
         value_set = self.__get_field_set()
+
+        if self.type == self.BOOLEAN_FIELD:
+            value = True if value == "on" else False
 
         try:
             field_value = value_set.get(registration=registration)
@@ -100,7 +106,7 @@ class RegistrationFormField(models.Model):
         field_value.field = self
         field_value.value = value
         field_value.full_clean()
-        field_value.save() #TODO See how to show this to admin
+        field_value.save()  # TODO See how to show this to admin
 
 
 class AbstractRegistrationInformation(models.Model):
@@ -126,13 +132,14 @@ class BooleanRegistrationInformation(AbstractRegistrationInformation):
 class TextRegistrationInformation(AbstractRegistrationInformation):
     """Checkbox information filled in by members when registering."""
 
-    value = models.TextField(blank=True, null=True, max_length=4096)
+    value = models.TextField(blank=True, default="", max_length=4096)
 
 
 class IntegerRegistrationInformation(AbstractRegistrationInformation):
     """Checkbox information filled in by members when registering."""
 
     value = models.IntegerField()
+
 
 class DatetimeRegistrationInformation(AbstractRegistrationInformation):
     """Checkbox information filled in by members when registering."""

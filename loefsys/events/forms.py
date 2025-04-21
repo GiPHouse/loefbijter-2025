@@ -1,17 +1,18 @@
+"""Module defining the forms for events."""
+
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
 from .models import RegistrationFormField
 
 
 class EventFieldsForm(forms.Form):
+    """Form for all fields associated with an event."""
 
     def __init__(self, *args, **kwargs):
         self.form_fields = kwargs.pop("form_fields")
         super().__init__(*args, **kwargs)
 
         for key, field in self.form_fields:
-
             match field["type"]:
                 case RegistrationFormField.BOOLEAN_FIELD:
                     self.fields[key] = forms.BooleanField(required=False)
@@ -21,8 +22,7 @@ class EventFieldsForm(forms.Form):
                     self.fields[key] = forms.DateTimeField(required=field["required"])
                 case _:  # RegistrationFormField.TEXT_FIELD
                     self.fields[key] = forms.CharField(
-                        required=field["required"],
-                        max_length=4096
+                        required=field["required"], max_length=4096
                     )
 
             self.fields[key].label = field["subject"]
@@ -30,6 +30,9 @@ class EventFieldsForm(forms.Form):
             self.fields[key].initial = field["default"]
 
     def field_values(self):
+        """Get field values."""
+        print("data", self.data)
         print("cleaned_data", self.cleaned_data)
-        for pk, _ in self.form_fields:
-            yield pk, self.data[str(pk)] #TODO Might need to be cleaned data?
+        for pk, field in self.form_fields:
+            registration_form_field = RegistrationFormField.objects.get(id=pk)
+            yield pk, self.data.get(str(pk), registration_form_field.default)
