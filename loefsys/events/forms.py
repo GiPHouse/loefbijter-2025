@@ -22,7 +22,10 @@ class EventFieldsForm(forms.Form):
                 case _:  # RegistrationFormField.TEXT_FIELD
                     self.fields[key] = forms.CharField(
                         required=field["required"],
-                        max_length=4096
+                        max_length=4096,
+                        widget=forms.Textarea(attrs={"class": "w-full text-base p4 border border-gray-400 rounded-md",
+                                                     "rows": 5,
+                                                     "placeholder": "Lorem Ipsum"}),
                     )
 
             self.fields[key].label = field["subject"]
