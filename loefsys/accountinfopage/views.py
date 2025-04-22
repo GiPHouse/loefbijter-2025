@@ -15,7 +15,6 @@ def get_account_info(request):
         "email": request.user.email,
         "phone_number": request.user.phone_number,
         "picture": request.user.picture,
-        "activities": "",
         "groups": request.user.groups.all(),
     }
 
@@ -30,7 +29,6 @@ def get_account_info(request):
                 "birthday": member.birthday.__str__(),
                 "show_birthday": member.show_birthday,
                 "member_since": membership.start.__str__(),
-                "year_of_joining": membership.start.year.__str__(),
                 "activities": "",
             }
         else:
