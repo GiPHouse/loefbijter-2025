@@ -1,20 +1,25 @@
 """Module defining the view for the sign up page."""
 
-from django.shortcuts import redirect, render
+from django.contrib.auth.views import LoginView
+from django.views.generic.edit import FormView
 
 from .forms import SignupForm
 
 
-def signup(request):
-    """Sign up page view."""
-    if request.method == "POST":
-        form = SignupForm(request.POST)
+class ProfileLoginView(LoginView):
+    """View for logging in users."""
 
-        if form.is_valid():
-            form.save()
-            return redirect("/")
+    next_page = "/account/"
 
-    else:
-        form = SignupForm()
 
-    return render(request, "signup.html", {"form": form})
+class ProfileSignupView(FormView):
+    """View for signing up users."""
+
+    template_name = "signup.html"
+    form_class = SignupForm
+    success_url = "/"
+
+    def form_valid(self, form):
+        """On valid credentials save the sign up data."""
+        form.save()
+        return super().form_valid(form)
