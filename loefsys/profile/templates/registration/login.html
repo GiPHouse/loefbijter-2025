@@ -11,4 +11,11 @@ Login page
     {{ form.as_p }}
     <button type="submit">Login</button>
   </form>
+  <a href="{% url 'password_reset' %}" class="btn btn-link">
+    Forgot your password?
+  </a>
+  </br>
+  <a href="{% url 'signup_page' %}" class="btn btn-link">
+    Aanmelden
+  </a>
 {% endblock %}

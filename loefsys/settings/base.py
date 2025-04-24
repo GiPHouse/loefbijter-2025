@@ -16,7 +16,7 @@ class BaseSettings(ClassySettings):
     required by other modules.
     """
 
-    BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
     DEBUG = denv.bool(False)
     ALLOWED_HOSTS = denv.list("")
