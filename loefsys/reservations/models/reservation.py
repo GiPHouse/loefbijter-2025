@@ -51,6 +51,7 @@ class Reservation(models.Model):
     # TODO reservee_user is a temporary field which should be replaced
     # by the fields reservee_member and reservee_group once the WebCie
     # has added Member(ship) to the admin page.
+    # TODO Add a constraint to check whether the skipper has the correct skipperships.
     authorized_skipper = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

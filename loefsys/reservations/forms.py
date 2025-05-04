@@ -34,4 +34,4 @@ class FilterReservationForm(forms.Form):
     # CHOICES = (("start", "Option 1"), ("-end", "Option 2"), ("location", "Location"),
     # ("type", "Type of reservation"))
     filters = forms.ChoiceField(choices=CHOICES)
-    # Modify the Reservation class to include a location field, date of creation.
+    # TODO Modify the Reservation class to include a location field, date of creation.
