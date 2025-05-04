@@ -6,7 +6,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from loefsys.reservations.forms import CreateReservationForm
+from loefsys.reservations.forms import CreateReservationForm, FilterReservationForm
 from loefsys.reservations.models.reservation import Reservation
 
 
@@ -18,7 +18,21 @@ class ReservationListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Only show instances of Reservation made by the user."""
-        return Reservation.objects.filter(reservee_user=self.request.user)
+        form = FilterReservationForm(self.request.GET)
+
+        if form.is_valid():
+            reservations = Reservation.objects.filter(
+                reservee_user=self.request.user
+            ).order_by(form.cleaned_data["filters"])
+        else:
+            reservations = Reservation.objects.filter(reservee_user=self.request.user)
+        return reservations
+
+    def get_context_data(self, **kwargs):
+        """Include the filter form in the context data."""
+        context = super().get_context_data(**kwargs)
+        context["form"] = FilterReservationForm(self.request.GET)
+        return context
 
 
 class ReservationCreateView(LoginRequiredMixin, CreateView):
