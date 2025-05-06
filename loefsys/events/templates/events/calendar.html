@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col h-screen">
+  <!-- Top Bar -->
+  <section id="calendar-topbar" class="bg-[#234193] p-8 flex flex-col">
+    <h1 class="text-6xl font-bold text-white pb-8 mt-4"> Calendar </h1>
+  </section>
+
+  <!-- Calendar Section -->
+  <section id="calendar-wrapper" class="bg-[#1BB1E6] flex-auto p-8 overflow-hidden relative">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+
+    <!-- FullCalendar Container -->
+    <div id='calendar' class="h-full"></div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          height: '100%',  // IMPORTANT: Makes calendar fill container height
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+          },
+          views: {
+            timeGridWeek: {
+              type: 'timeGrid',
+              duration: { weeks: 1 }
+            },
+            listWeek: {
+              type: 'list',
+              duration: { weeks: 1 }
+            }
+          },
+          events: "event_filler", 
+        });
+        calendar.render();
+      });
+    </script>
+  </section>
+  {% include "menu.html" %}
+</div>
+{% endblock %}
