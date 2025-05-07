@@ -38,7 +38,7 @@ def get_account_info(request):
     return user_info, member_info
 
 
-@login_required(login_url="signup_page")
+@login_required(login_url="signup")
 def accountinfoedit(request):
     """View for editing accountinformation."""
     if request.method == "POST":
@@ -76,7 +76,7 @@ def accountinfoedit(request):
     )
 
 
-@login_required(login_url="signup_page")
+@login_required(login_url="signup")
 def accountinfo(request):
     """View for loading the accountinformation page."""
     user_info, member_info = get_account_info(request)
