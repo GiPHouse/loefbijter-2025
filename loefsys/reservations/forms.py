@@ -30,8 +30,12 @@ class CreateReservationForm(forms.ModelForm):
 class FilterReservationForm(forms.Form):
     """A form to filter reservations."""
 
-    CHOICES = (("start", "Option 1"), ("-end", "Option 2"))
-    # CHOICES = (("start", "Option 1"), ("-end", "Option 2"), ("location", "Location"),
-    # ("type", "Type of reservation"))
-    filters = forms.ChoiceField(choices=CHOICES)
-    # TODO Modify the Reservation class to include a location field, date of creation.
+    CHOICES = (
+        ("start", "Start date"),
+        ("-end", "End date"),
+        ("location", "Location"),
+        ("-date_of_creation", "Newest first"),
+        ("A-Z", "A-Z"),
+        ("type", "Type"),
+    )
+    filters = forms.ChoiceField(choices=CHOICES, required=False)

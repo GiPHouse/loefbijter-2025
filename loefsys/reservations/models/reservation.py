@@ -62,6 +62,7 @@ class Reservation(models.Model):
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
+    date_of_creation = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = (

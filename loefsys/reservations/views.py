@@ -1,12 +1,14 @@
 """Module defining the class-based views for the reservations."""
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from loefsys.reservations.forms import CreateReservationForm, FilterReservationForm
+from loefsys.reservations.models.reservable import ReservableItem
 from loefsys.reservations.models.reservation import Reservation
 
 
@@ -20,10 +22,23 @@ class ReservationListView(LoginRequiredMixin, ListView):
         """Only show instances of Reservation made by the user."""
         form = FilterReservationForm(self.request.GET)
 
-        if form.is_valid():
-            reservations = Reservation.objects.filter(
-                reservee_user=self.request.user
-            ).order_by(form.cleaned_data["filters"])
+        if form.is_valid() and form.cleaned_data["filters"]:
+            if form.cleaned_data["filters"] == "location":
+                reservations = Reservation.objects.filter(
+                    reservee_user=self.request.user
+                ).order_by("reserved_item__location")
+            elif form.cleaned_data["filters"] == "A-Z":
+                reservations = Reservation.objects.filter(
+                    reservee_user=self.request.user
+                ).order_by(Lower("reserved_item"))
+            elif form.cleaned_data["filters"] == "type":
+                reservations = Reservation.objects.filter(
+                    reservee_user=self.request.user
+                ).order_by("reserved_item__reservable_type")
+            else:
+                reservations = Reservation.objects.filter(
+                    reservee_user=self.request.user
+                ).order_by(form.cleaned_data["filters"])
         else:
             reservations = Reservation.objects.filter(reservee_user=self.request.user)
         return reservations
@@ -45,6 +60,16 @@ class ReservationCreateView(LoginRequiredMixin, CreateView):
         """Add the user who made the reservation to the Reservation instance."""
         form.instance.reservee_user = self.request.user
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """Include the location in the context data."""
+        context = super().get_context_data(**kwargs)
+        context["location"] = self.kwargs.get("location")
+        reservables = ReservableItem.objects.filter(
+            location=self.kwargs.get("location")
+        )
+        context["reservables"] = reservables
+        return context
 
 
 class ReservationUpdateView(LoginRequiredMixin, UpdateView):
