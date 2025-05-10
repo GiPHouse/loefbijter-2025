@@ -4,8 +4,8 @@ from decimal import Decimal
 from typing import Any
 
 from django.contrib.auth import get_user_model
-from django.db import models
-from django.db.models import Case, F, When
+from django.db import models, transaction
+from django.db.models import Case, F, Q, When
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
@@ -73,16 +73,14 @@ class EventRegistration(TimeStampedModel):
 
     @property
     def form_fields(self):
+        """Get form fields and their values on the registration form."""
         fields = self.event.registrationformfield_set.all()
-        print(f"Fields: {fields}")
-        return [
-            (field, field.get_value_for(self)) for field in fields
-        ]
+        return [(field, field.get_value_for(self)) for field in fields]
 
     objects = EventRegistrationManager()
 
     class Meta:
-        unique_together = ("event", "contact")
+        unique_together = ("event", "contact", "status")
 
     def __str__(self) -> str:
         return f"{self.event} | {self.contact}"
@@ -129,16 +127,30 @@ class EventRegistration(TimeStampedModel):
         Afterwards, the event is notified to potentially activate a registration in the
         queue.
         """
+        print("CANCELLATION STARTED")
+
         if self.status in {
             RegistrationStatus.CANCELLED_FINE,
             RegistrationStatus.CANCELLED_NOFINE,
         }:
             return
 
-        self.status = (
-            RegistrationStatus.CANCELLED_FINE
-            if self.event.fine_on_cancellation()
-            and self.status == RegistrationStatus.ACTIVE
-            else RegistrationStatus.CANCELLED_NOFINE
-        )
-        self.event.process_cancellation()
+        with transaction.atomic():
+            # Set status to cancelled
+            self.status = (
+                RegistrationStatus.CANCELLED_FINE
+                if self.event.fine_on_cancellation()
+                and self.status == RegistrationStatus.ACTIVE
+                else RegistrationStatus.CANCELLED_NOFINE
+            )
+
+            # Remove old cancelled registrations
+            EventRegistration.objects.filter(
+                contact=self.contact, event=self.event
+            ).filter(
+                Q(status=RegistrationStatus.CANCELLED_FINE)
+                | Q(status=RegistrationStatus.CANCELLED_NOFINE)
+            ).delete()
+
+            self.save()
+            self.event.process_cancellation()

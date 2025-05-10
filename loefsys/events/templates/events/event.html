@@ -15,7 +15,7 @@
     <section id="event-detail" class="bg-[#1BB1E6] flex-auto p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-2xl">
             <div class="border p-4 rounded-xl bg-gray-100 col-span-2 flex gap-2">
-                <span class="font-bold whitespace-nowrap text-lg">Beschrijving: </span> 
+                <span class="font-bold whitespace-nowrap text-lg">Beschrijving: </span>
                 <span class="text-lg">{{ event.description }}</span>
             </div>
             <div class="border p-4 rounded-xl bg-gray-100">
@@ -31,12 +31,46 @@
                 <span class="font-bold">Registratie Deadline:</span> {{ event.registration_deadline|date:"d/m/y H:i" }}
             </div>
             <div class="border p-4 rounded-xl bg-gray-100">
+                <span class="font-bold">Annulering Deadline:</span> {{ event.cancelation_deadline|date:"d/m/y H:i" }}
+            </div>
+            <div class="border p-4 rounded-xl bg-gray-100">
                 <span class="font-bold">Locatie:</span> {{ event.location }}
             </div>
             <div class="border p-4 rounded-xl bg-gray-100">
                 <span class="font-bold">Prijs:</span> {{ event.price }}
             </div>
+            <div class="border p-4 rounded-xl bg-gray-100">
+                <span class="font-bold">Inschrijvingen:</span> {{ num_registrations }} / {{ event.capacity }}
+            </div>
         </div>
+        {% if registration_active %}
+        <div class="border p-4 rounded-xl bg-gray-100 justify-center mt-4">
+            <span class="font-bold text-2xl">
+                {% if queue_position > 0 %}
+                    {{ queue_position }}e in de wachtrij.</span>
+                {% else %}
+                    Je bent ingeschreven.
+                {% endif %}
+            <form method="post" action="{{ request.path }}" id="cancellation-form" class="flex flex-col">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="cancel">
+                <div>
+                    <input required=1 type="hidden" name="fine-consent" value="1" id="fine-consent-checkbox">
+                    <label for="fine-consent" class="hidden font-normal" id="fine-consent-label">Ik weet dat ik me te laat uitschrijf en accepteer de consquenties (boete)</label>
+                </div>
+                <input type="submit" value="Uitschrijven" id="cancellation-button" class="font-bold text-3xl bg-gray-100 py-2 px-4 rounded">
+            </form>
+            <script>
+                const date = new Date();
+                const cancellationDeadline = new Date("{{ event.cancelation_deadline|date:'Y-m-d H:i:s'}}");
+                if ({{queue_position}} == 0 && date >= cancellationDeadline) {
+                    // Only show fine consent option if your registration is ACTIVE and the cancellation deadline is due
+                    document.getElementById("fine-consent-label").classList.remove("hidden")
+                    document.getElementById("fine-consent-checkbox").type="checkbox"
+                }
+            </script>
+        </div>
+        {% else %}
         <div class="border p-4 rounded-xl bg-gray-100 justify-center mt-4">
             <button id="registration-button" class="font-bold text-3xl bg-gray-100 py-2 px-4 rounded">
             </button>
@@ -64,12 +98,18 @@
                 csrfTokenInput.name = "csrfmiddlewaretoken";
                 csrfTokenInput.value = "{{ csrf_token }}";
 
+                const actionInput = document.createElement("input");
+                actionInput.type = "hidden";
+                actionInput.name = "action"
+                actionInput.value = "register"
+
                 const submitInput = document.createElement("input");
                 submitInput.type = "submit";
                 submitInput.value = "Register";
                 submitInput.className = "btn btn-primary";
 
                 form.appendChild(csrfTokenInput);
+                form.appendChild(actionInput);
                 form.appendChild(submitInput);
 
                 document.body.appendChild(form);
@@ -80,6 +120,7 @@
             });
             </script>
         </div>
+        {% endif %}
     </section>
 
 </div>
