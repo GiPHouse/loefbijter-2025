@@ -65,10 +65,10 @@ class ReservationCreateView(LoginRequiredMixin, CreateView):
         """Include the location in the context data."""
         context = super().get_context_data(**kwargs)
         context["location"] = self.kwargs.get("location")
-        reservables = ReservableItem.objects.filter(
+        reservable_items = ReservableItem.objects.filter(
             location=self.kwargs.get("location")
         )
-        context["reservables"] = reservables
+        context["reservable_items"] = reservable_items
         return context
 
 
