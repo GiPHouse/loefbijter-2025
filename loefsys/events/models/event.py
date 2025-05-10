@@ -265,14 +265,14 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
 
         For events with required registration, registration is only possible when the
         event is published and in the registration window defined by
-        :attr:`.start` and :attr:`.end`.
+        :attr:`.registration_start` and :attr:`.registration_deadline`.
 
         Returns
         -------
         bool
             A boolean that defines whether registrations are in the registration window.
         """
-        return self.start < timezone.now() < self.end
+        return self.registration_start < timezone.now() < self.registration_deadline
 
 
 class EventOrganizer(TimeStampedModel):

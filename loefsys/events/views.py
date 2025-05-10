@@ -63,21 +63,24 @@ class EventView(DetailView):
         """Handle the post request for the event view."""
         event = self.get_object()
         action = request.POST.get("action")
+        print(request.POST)
         if action == "register":
-            try:
-                register = EventRegistration(
-                    event=event,
-                    contact=request.user,
-                    price_at_registration=event.price,
-                    fine_at_registration=event.fine,
-                    costs_paid=0.00,
-                )
-                register.save()
-                if event.has_form_fields:
-                    return redirect("events:registration", slug=event.slug)
-            except IntegrityError:
-                # TODO handle the error
-                print("Registration already exists")
+            # Check registration deadline
+            if self.get_object().registration_window_open():
+                try:
+                    register = EventRegistration(
+                        event=event,
+                        contact=request.user,
+                        price_at_registration=event.price,
+                        fine_at_registration=event.fine,
+                        costs_paid=0.00,
+                    )
+                    register.save()
+                    if event.has_form_fields:
+                        return redirect("events:registration", slug=event.slug)
+                except IntegrityError:
+                    # TODO handle the error
+                    print("Registration already exists")
         elif action == "cancel":
             # Only cancel if cancellation deadline is NOT due or
             # it is due and consent was given to be fined
