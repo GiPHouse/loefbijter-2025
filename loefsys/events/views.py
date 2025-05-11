@@ -66,7 +66,7 @@ class EventView(DetailView):
         print(request.POST)
         if action == "register":
             # Check registration deadline
-            if self.get_object().registration_window_open():
+            if self.get_object().registrations_open():
                 try:
                     register = EventRegistration(
                         event=event,
