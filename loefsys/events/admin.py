@@ -86,6 +86,7 @@ class EventAdmin(admin.ModelAdmin):
         "capacity",
         "location",
         "category",
+        "published",
     )
     inlines: ClassVar[list[type]] = [RegistrationFormInline, EventOrganizerInline]
 
