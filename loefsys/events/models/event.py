@@ -200,13 +200,9 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         bool
             A boolean that defines whether registrations are open.
         """
-        if (
-            not self.published
-            or not self.registration_deadline
-            or not self.cancelation_deadline
-        ):
+        if not self.published or not self.registration_deadline:
             return False
-        return self.registration_deadline < timezone.now() < self.cancelation_deadline
+        return self.registration_start < timezone.now() < self.registration_deadline
 
     def max_capacity_reached(self) -> bool:
         """Check whether the max capacity for this event is reached.
