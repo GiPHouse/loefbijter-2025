@@ -6,7 +6,7 @@ Bewerk reservering
 
 {% block content %}
 <div class="bg-[#1BB1E6] relative flex flex-col h-screen ">
-    <section class="bg-[#234193] p-8 absolute top-20 w-full">
+    <section class="bg-[#234193] p-8 w-full">
         <h1 class="text-5xl font-bold text-white">RESERVEREN</h1>
         <div class="flex justify-center items-center">
             <ul class="flex flex-wrap text-2xl font-medium text-center text-gray-500 dark:text-gray-400">
@@ -31,7 +31,7 @@ Bewerk reservering
         <form id="reservationform" method="post">
             {% csrf_token %}
             {{ form.non_field_errors }}
-            <div class="bg-white p-4 rounded-3xl shadow-lg w-4/5 mx-auto text-left">
+            <div class="bg-white p-4 rounded-3xl border-4 border-black shadow-lg w-4/5 mx-auto text-left">
                 <div class="flex flex-wrap gap-4 justify-center">
                     {% for field in form %}
                     {% if field.name != 'reserved_item' %}
@@ -54,15 +54,15 @@ Bewerk reservering
 
             <div class="flex flex-wrap gap-4 justify-center w-3/5 mx-auto mt-4">
                 {% for choice_value, choice_label in form.reserved_item.field.choices %}
-                    <div class="flex items-center border-8 border-black bg-white rounded-3xl w-full p-4 mb-4"> 
+                    <div class="w-full"> 
                         <input type="radio"
                             value="{{ choice_value }}"
                             name="{{ form.reserved_item.name }}"
                             id="reserved_item_{{ forloop.counter }}"
-                            class="mr-4">
+                            class="peer hidden">
                         
                         <label for="reserved_item_{{ forloop.counter }}"
-                            class="w-full text-3xl font-medium text-gray-900">
+                            class="text-3xl font-medium text-gray-900 flex items-center border-4 border-black bg-white rounded-3xl w-full p-4 mb-4 peer-checked:bg-gray-400">
                             {{ choice_label }}
                         </label>
                     </div>
@@ -71,7 +71,7 @@ Bewerk reservering
         </form>
     </section>
 
-    <section id="submit reservation" class="bg-[#1BB1E6] flex-auto p-8">
+    <section id="submit reservation" class="bg-[#1BB1E6] flex flex-col p-8 pb-30">
         <h1 class="text-5xl font-bold"> RESERVERING INDIENEN </h1>
         <form method="post" class="w-4/5 mx-auto">
             {% csrf_token %}
@@ -85,5 +85,9 @@ Bewerk reservering
             <span class="font-bold text-3xl"> Anuleer </span>
         </a>
     </section>
-{% include "menu.html" %}
+
+
+    <div class="fixed bottom-0 w-full">
+        {% include "menu.html" %}
+    </div>
 {% endblock %}
