@@ -3,6 +3,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from loefsys.users.models.skippership import Skippership
+
 from .choices import FleetChoices
 from .reservable import ReservableItem
 
@@ -32,4 +34,7 @@ class Boat(ReservableItem):
         choices=FleetChoices,
         default=FleetChoices.OTHER,
         verbose_name=_("Boat provider"),
+    )
+    requires_skippership = models.ForeignKey(
+        Skippership, null=True, blank=True, on_delete=models.CASCADE
     )

@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from loefsys.reservations.models.reservable import ReservableItem
 from loefsys.users.models.user import User
+from loefsys.users.models.user_skippership import UserSkippership
 
 
 class Reservation(models.Model):
@@ -53,7 +54,7 @@ class Reservation(models.Model):
     # has added Member(ship) to the admin page.
     # TODO Add a constraint to check whether the skipper has the correct skipperships.
     authorized_skipper = models.ForeignKey(
-        User,
+        UserSkippership,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -85,6 +86,11 @@ class Reservation(models.Model):
             #     name="member_or_group",
             #     violation_error_message="Only a group or a member can make reservation, not both.",  # noqa: E501
             # ),  # TODO create tests for this
+            # CheckConstraint(
+            #     condition=,
+            #     name="authorized_skipper",
+            #     violation_error_message=""
+            # ),
         )
 
     def __str__(self) -> str:
