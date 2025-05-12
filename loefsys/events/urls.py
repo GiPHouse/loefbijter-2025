@@ -9,5 +9,5 @@ urlpatterns = [
     path("<slug:slug>/", EventView.as_view(), name="event"),
     # path("<int:pk>/register/", None, name="register"),
     # path("<slug:slug>/registration/cancel", None, name="cancel"),
-    path("<int:pk>/registration/", RegistrationFormView.as_view(), name="registration"),
+    path("<slug:slug>/registration/", RegistrationFormView.as_view(), name="registration"),  # noqa: E501
 ]
