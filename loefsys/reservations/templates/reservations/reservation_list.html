@@ -12,12 +12,12 @@
             <form method="get" class="bg-white p-8 rounded-3xl shadow-lg w-4/5 mx-auto text-3xl font-bold">
                 {% csrf_token %}
                 {{ form }}
-                <input type="submit" value="Filter Toepassen" class="rounded-3xl w-1/2 border-4 hover:bg-gray-300">
+                <input type="submit" value="Filter Toepassen" class="rounded-3xl w-1/2 border-4 hover:bg-gray-400">
             </form>
         {% endif %}
 
         {% for reservation in reservations %}
-            <a href="{% url 'reservation-detail' pk=reservation.id %}" class="btn btn-primary p-4 border-2 border-red-500 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-white hover:bg-gray-300 text-left">
+            <a href="{% url 'reservation-detail' pk=reservation.id %}" class="btn btn-primary p-4 border-2 border-red-500 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-white hover:bg-gray-400 text-left">
                 <span class="font-bold text-3xl">
                     <span class="font-bold text-5xl">
                         {{ reservation }}
@@ -34,7 +34,7 @@
     </section>
     <section id="create reservation" class="bg-[#1BB1E6] flex-auto p-8">
         <h1 class="text-5xl font-bold">MAAK NIEUWE RESERVERING</h1>
-        <a href="{% url 'reservation-add' '1' %}" class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-gray-200 hover:bg-gray-400 block text-center">
+        <a href="{% url 'reservation-add' '1' %}" class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-white hover:bg-gray-400 block text-center">
             <span class="font-bold text-3xl">
                 Maak reservering
             </span>

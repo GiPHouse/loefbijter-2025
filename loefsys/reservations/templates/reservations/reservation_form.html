@@ -53,21 +53,22 @@ Bewerk reservering
             </div>
 
             <div class="flex flex-wrap gap-4 justify-center w-3/5 mx-auto mt-4">
-                {% for choice_value, choice_label in form.reserved_item.field.choices %}
+                {% for item in form.reserved_item.field.queryset %}
                     <div class="w-full"> 
                         <input type="radio"
-                            value="{{ choice_value }}"
+                            value="{{ item.pk }}"
                             name="{{ form.reserved_item.name }}"
                             id="reserved_item_{{ forloop.counter }}"
                             class="peer hidden" required>
-                        
+
                         <label for="reserved_item_{{ forloop.counter }}"
-                            class="text-3xl font-medium text-gray-900 flex items-center border-4 border-black bg-white rounded-3xl w-full p-4 mb-4 peer-checked:bg-gray-400">
-                            {{ choice_label }}
+                            class="text-3xl font-medium text-gray-900 flex items-center border-6 {% if item.is_reservable %} border-green-600 {% else %} border-red-600 {% endif %} bg-white rounded-3xl w-full p-4 mb-4 peer-checked:bg-gray-400">
+                            {{ item.name }}
                         </label>
                     </div>
                 {% endfor %}
             </div>
+
         </form>
     </section>
 
