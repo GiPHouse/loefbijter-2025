@@ -33,10 +33,10 @@ class FilterReservationForm(forms.Form):
     """A form to filter reservations."""
 
     CHOICES = (
-        ("start", "Start date"),
-        ("-end", "End date"),
-        ("location", "Location"),
-        ("-date_of_creation", "Newest first"),
+        ("start", "Starttijd"),
+        ("-end", "Endtijd"),
+        ("location", "Locatie"),
+        ("-date_of_creation", "Nieuwste eerst"),
         ("A-Z", "A-Z"),
         ("type", "Type"),
     )
