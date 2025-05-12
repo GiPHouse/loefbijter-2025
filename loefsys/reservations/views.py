@@ -23,22 +23,23 @@ class ReservationListView(LoginRequiredMixin, ListView):
         form = FilterReservationForm(self.request.GET)
 
         if form.is_valid() and form.cleaned_data["filters"]:
-            if form.cleaned_data["filters"] == "location":
-                reservations = Reservation.objects.filter(
-                    reservee_user=self.request.user
-                ).order_by("reserved_item__location")
-            elif form.cleaned_data["filters"] == "A-Z":
-                reservations = Reservation.objects.filter(
-                    reservee_user=self.request.user
-                ).order_by(Lower("reserved_item"))
-            elif form.cleaned_data["filters"] == "type":
-                reservations = Reservation.objects.filter(
-                    reservee_user=self.request.user
-                ).order_by("reserved_item__reservable_type")
-            else:
-                reservations = Reservation.objects.filter(
-                    reservee_user=self.request.user
-                ).order_by(form.cleaned_data["filters"])
+            match form.cleaned_data["filters"]:
+                case "location":
+                    reservations = Reservation.objects.filter(
+                        reservee_user=self.request.user
+                    ).order_by("reserved_item__location")
+                case "A-Z":
+                    reservations = Reservation.objects.filter(
+                        reservee_user=self.request.user
+                    ).order_by(Lower("reserved_item"))
+                case "type":
+                    reservations = Reservation.objects.filter(
+                        reservee_user=self.request.user
+                    ).order_by("reserved_item__reservable_type")
+                case _:
+                    reservations = Reservation.objects.filter(
+                        reservee_user=self.request.user
+                    ).order_by(form.cleaned_data["filters"])
         else:
             reservations = Reservation.objects.filter(reservee_user=self.request.user)
         return reservations
