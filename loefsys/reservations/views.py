@@ -3,6 +3,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
@@ -34,9 +35,9 @@ class ReservationListView(LoginRequiredMixin, ListView):
                 case _:
                     filters = form.cleaned_data["filters"]
 
-        return Reservation.objects.filter(reservee_user=self.request.user).order_by(
-            filters
-        )
+        return Reservation.objects.filter(
+            reservee_user=self.request.user, start__gt=timezone.now()
+        ).order_by(filters)
 
     def get_context_data(self, **kwargs):
         """Include the filter form in the context data."""
@@ -51,6 +52,14 @@ class ReservationCreateView(LoginRequiredMixin, CreateView):
     model = Reservation
     form_class = CreateReservationForm
 
+    def get_form(self, *args, **kwargs):
+        """Include the location in the form."""
+        form = super().get_form(*args, **kwargs)
+        form.fields["reserved_item"].queryset = ReservableItem.objects.filter(
+            location=self.kwargs.get("location")
+        )
+        return form
+
     def form_valid(self, form):
         """Add the user who made the reservation to the Reservation instance."""
         form.instance.reservee_user = self.request.user
@@ -60,10 +69,6 @@ class ReservationCreateView(LoginRequiredMixin, CreateView):
         """Include the location in the context data."""
         context = super().get_context_data(**kwargs)
         context["location"] = self.kwargs.get("location")
-        reservable_items = ReservableItem.objects.filter(
-            location=self.kwargs.get("location")
-        )
-        context["reservable_items"] = reservable_items
         return context
 
 

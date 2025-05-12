@@ -9,7 +9,7 @@ class CreateReservationForm(forms.ModelForm):
     """A form to create reservations."""
 
     reserved_item = forms.ModelChoiceField(
-        queryset=ReservableItem.objects.all(), widget=forms.RadioSelect
+        queryset=ReservableItem.objects.none(), widget=forms.RadioSelect
     )
     start = forms.DateTimeField(
         input_formats=["%I:%M %p %d-%b-%Y"],
@@ -34,7 +34,7 @@ class FilterReservationForm(forms.Form):
 
     CHOICES = (
         ("start", "Starttijd"),
-        ("-end", "Eindtijd"),
+        ("end", "Eindtijd"),
         ("location", "Locatie"),
         ("-date_of_creation", "Nieuwste eerst"),
         ("A-Z", "A-Z"),
