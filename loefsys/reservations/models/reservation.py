@@ -125,16 +125,16 @@ class Reservation(models.Model):
                 raise ValidationError("This item is not reservable at the moment.")
 
             if self.reserved_item.reservable_type.category == ReservableCategories.BOAT:
-                skippership = Boat.objects.get(
+                requires_skippership = Boat.objects.get(
                     pk=self.reserved_item.pk
                 ).requires_skippership
-                if skippership:
+                if requires_skippership:
                     if not self.authorized_skipper:
                         raise ValidationError(
                             "The boat selected requires a skippership to be set."
                         )
 
-                    if skippership != self.authorized_skipper.skippership:
+                    if requires_skippership != self.authorized_skipper.skippership:
                         raise ValidationError(
                             "The skippership set is not valid for this boat."
                         )
