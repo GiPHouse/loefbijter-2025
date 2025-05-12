@@ -3,6 +3,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
@@ -34,9 +35,9 @@ class ReservationListView(LoginRequiredMixin, ListView):
                 case _:
                     filters = form.cleaned_data["filters"]
 
-        return Reservation.objects.filter(reservee_user=self.request.user).order_by(
-            filters
-        )
+        return Reservation.objects.filter(
+            reservee_user=self.request.user, start__gt=timezone.now()
+        ).order_by(filters)
 
     def get_context_data(self, **kwargs):
         """Include the filter form in the context data."""
