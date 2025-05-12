@@ -34,7 +34,7 @@ class FilterReservationForm(forms.Form):
 
     CHOICES = (
         ("start", "Starttijd"),
-        ("-end", "Endtijd"),
+        ("-end", "Eindtijd"),
         ("location", "Locatie"),
         ("-date_of_creation", "Nieuwste eerst"),
         ("A-Z", "A-Z"),

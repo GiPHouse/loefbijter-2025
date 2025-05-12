@@ -19,30 +19,24 @@ class ReservationListView(LoginRequiredMixin, ListView):
     context_object_name = "reservations"
 
     def get_queryset(self):
-        """Only show instances of Reservation made by the user."""
+        """Only show instances of Reservation made by the user, with the option to filter them."""  # noqa: E501
         form = FilterReservationForm(self.request.GET)
+        filters = "start"
 
         if form.is_valid() and form.cleaned_data["filters"]:
             match form.cleaned_data["filters"]:
                 case "location":
-                    reservations = Reservation.objects.filter(
-                        reservee_user=self.request.user
-                    ).order_by("reserved_item__location")
+                    filters = "reserved_item__location"
                 case "A-Z":
-                    reservations = Reservation.objects.filter(
-                        reservee_user=self.request.user
-                    ).order_by(Lower("reserved_item"))
+                    filters = Lower("reserved_item")
                 case "type":
-                    reservations = Reservation.objects.filter(
-                        reservee_user=self.request.user
-                    ).order_by("reserved_item__reservable_type")
+                    filters = "reserved_item__reservable_type"
                 case _:
-                    reservations = Reservation.objects.filter(
-                        reservee_user=self.request.user
-                    ).order_by(form.cleaned_data["filters"])
-        else:
-            reservations = Reservation.objects.filter(reservee_user=self.request.user)
-        return reservations
+                    filters = form.cleaned_data["filters"]
+
+        return Reservation.objects.filter(reservee_user=self.request.user).order_by(
+            filters
+        )
 
     def get_context_data(self, **kwargs):
         """Include the filter form in the context data."""
