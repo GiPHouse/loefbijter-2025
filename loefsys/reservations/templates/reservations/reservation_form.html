@@ -9,7 +9,7 @@ Bewerk reservering
     <section class="bg-[#234193] p-8 w-full">
         <h1 class="text-5xl font-bold text-white">RESERVEREN</h1>
         <div class="flex justify-center items-center">
-            <ul class="flex flex-wrap text-2xl font-medium text-center text-gray-500 dark:text-gray-400">
+            <ul class="flex flex-wrap text-4xl font-medium text-center text-gray-500 dark:text-gray-400">
                 <li class="me-2">
                     <a href="{% url 'reservation-add' '1' %}"
                        class="uppercase inline-block px-4 py-3 {% if location == 1 %}text-white active" {% endif %}
@@ -36,10 +36,10 @@ Bewerk reservering
                     {% for field in form %}
                     {% if field.name != 'reserved_item' %}
                         <div class="flex flex-col items-center text-center min-w-[200px] space-y-2">
-                            <label for="{{ field.id_for_label }}" class="text-xl font-bold uppercase">
+                            <label for="{{ field.id_for_label }}" class="text-3xl font-bold">
                                 {{ field.label }}:
                             </label>
-                            <div class="text-xl font-bold w-full">{{ field }}</div>
+                            <div class="text-3xl font-bold w-full">{{ field }}</div>
                             {% if field.help_text %}
                             <p class="text-sm text-gray-500 font-medium">{{ field.help_text }}</p>
                             {% endif %}
