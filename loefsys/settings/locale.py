@@ -17,7 +17,7 @@ class LocaleSettings(AuthSettings, TemplateSettings, BaseSettings):
     """Class containing the configuration for the localization."""
 
     TIME_ZONE = denv("Europe/Amsterdam")
-    LANGUAGE_CODE = "en-us"
+    LANGUAGE_CODE = "nl-NL"
     USE_I18N = True
     USE_TZ = True
 

@@ -28,16 +28,19 @@ Home
     </section>
     <section id="events" class="bg-[#1BB1E6] flex-auto p-8">
         <h1 class="text-5xl font-bold">MIJN LOEFBIJTER</h1>
-            <div class="p-4 m-4 border-2 border-black rounded-3xl mx-auto w-4/5 bg-white text-left flex flex-row">
-                <img class="w-25 mr-4" src="https://eveks.nl/4432-home_default/test.jpg">
+        {% for event in events %}
+            <button onClick="(function() { alert('test') })()"
+                class="p-4 m-4 border-2 border-black rounded-3xl mx-auto w-4/5 bg-white text-left flex flex-row">
+                <img class="w-25 mr-4" src="{{ event.picture }}">
                 <div>
                     <h1 class="font-bold text-4xl">
-                        Bierproeverij
+                        {{ event.title }}
                     </h1>
-                    <p class="text-3xl">10/03 19:30 - 21:00</p>
-                    <p class="text-3xl">Café jos</p>
+                    <p class="text-3xl">{{ event.start|date:"d/m/Y H:i" }} - {{ event.end|date:"d/m/Y H:i" }}</p>
+                    <p class="text-3xl">{{ event.location }}</p>
                 </div>
-            </div>
+            </button>
+        {% endfor %}
     </section>
     {% include "menu.html" %}
 </div>

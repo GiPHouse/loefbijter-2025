@@ -31,7 +31,7 @@ select {
 }
 
 /* Button styling */
-button {
+button, input[type="submit"] {
   @apply bg-gray-200 text-black font-normal rounded;
   @apply hover:bg-gray-300 active:bg-gray-400;
 }

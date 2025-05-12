@@ -95,6 +95,8 @@ class EventAdmin(admin.ModelAdmin):
 class EventRegistrationAdmin(admin.ModelAdmin):
     """Admin interface for managing event registrations."""
 
+    list_display = ("__str__", "status")
+
     inlines = (
         BooleanRegistrationInformationInline,
         TextRegistrationInformationInline,

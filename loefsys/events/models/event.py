@@ -80,14 +80,14 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
 
     registration_start = models.DateTimeField(
         _("Start of registration window"), blank=True, null=True
-        )
+    )
 
     registration_deadline = models.DateTimeField(
         _("Registration deadline"), blank=True, null=True
-        )
+    )
     cancelation_deadline = models.DateTimeField(
         _("Cancelation deadline"), blank=True, null=True
-        )
+    )
 
     category = models.PositiveSmallIntegerField(
         choices=EventCategories, verbose_name=_("Category")
@@ -147,7 +147,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
     objects = EventManager()
 
     class Meta:
-        constraints=(
+        constraints = (
             CheckConstraint(
                 condition=Q(end__gt=F("start")),
                 name="event_end_gt_start",
@@ -171,7 +171,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
             CheckConstraint(
                 condition=Q(cancelation_deadline__gt=F("registration_start")),
                 name="can_end_gt_reg_start",
-                violation_error_message="cancelation can't be before registration opens"
+                violation_error_message="cancelation can't be before registration opens",  # noqa: E501
             ),
         )
 
@@ -190,7 +190,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         bool
             A boolean that defines whether registration is mandatory.
         """
-        return hasattr(self, "registration_details")
+        return self.capacity > 0
 
     def registrations_open(self) -> bool:
         """Determine whether it is possible for users to register for this event.
@@ -200,9 +200,9 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         bool
             A boolean that defines whether registrations are open.
         """
-        if not self.published or not self.registration_deadline or not self.cancelation_deadline:  # noqa: E501
+        if not self.published or not self.registration_deadline:
             return False
-        return self.registration_deadline < timezone.now() < self.cancelation_deadline
+        return self.registration_start < timezone.now() < self.registration_deadline
 
     def max_capacity_reached(self) -> bool:
         """Check whether the max capacity for this event is reached.
@@ -228,7 +228,7 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
         """
         if not self.mandatory_registration():
             return True
-        deadline = self.registration_details.cancel_deadline or self.start
+        deadline = self.cancelation_deadline or self.start
         return deadline < timezone.now()
 
     def process_cancellation(self) -> None:
@@ -243,19 +243,18 @@ class Event(TitleSlugDescriptionModel, TimeStampedModel):
 
         num_active = self.eventregistration_set.active().count()
         num_queued = self.eventregistration_set.queued().count()
-        if not num_queued or num_active >= self.registration_details.capacity:
+        if not num_queued or num_active >= self.capacity:
             return
 
-        num_available = self.registration_details.capacity - num_active
+        num_available = self.capacity - num_active
         num_to_add = min(num_available, num_queued)
-        objs = self.eventregistration_set.queued().order_by_creation()[:num_to_add]
+        objs = self.eventregistration_set.queued().order_by("created")[:num_to_add]
         modified = timezone.now()
         for obj in objs:
             obj.status = RegistrationStatus.ACTIVE
             obj.modified = modified
         # As save() isn't called on the objects, we manually update the field modified.
         self.eventregistration_set.bulk_update(objs, ["status", "modified"])
-
 
     def registration_window_open(self) -> bool:
         """Determine whether it is possible for users to register for this event.

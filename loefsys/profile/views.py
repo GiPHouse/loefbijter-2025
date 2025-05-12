@@ -1,20 +1,18 @@
 """Module defining the view for the sign up page."""
 
-from django.shortcuts import redirect, render
+from django.views.generic import FormView
 
 from .forms import SignupForm
 
 
-def signup(request):
+class SignupFormView(FormView):
     """Sign up page view."""
-    if request.method == "POST":
-        form = SignupForm(request.POST)
 
-        if form.is_valid():
-            form.save()
-            return redirect("/")
+    template_name = "signup.html"
+    form_class = SignupForm
+    success_url = "/"
 
-    else:
-        form = SignupForm()
-
-    return render(request, "signup.html", {"form": form})
+    def form_valid(self, form):
+        """Save the new user and log them in after a successful registration."""
+        form.save()
+        return super().form_valid(form)
