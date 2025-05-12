@@ -11,5 +11,5 @@ urlpatterns = [
     # path("<slug:slug>/registration/cancel", None, name="cancel"),
     path("<slug:slug>/registration/", RegistrationFormView.as_view(), name="registration"),  # noqa: E501
     path("", CalendarView.as_view(), name="events"),  # noqa: E501
-    path("", EventFillerView.as_view(), name="event_filler"),  # noqa: E501 
+    path("event_filler", EventFillerView.as_view(), name="event_filler"),  # noqa: E501 
 ]

@@ -12,14 +12,16 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
 
     <!-- FullCalendar Container -->
-    <div id='calendar' class="h-full"></div>
+    <div id='calendar' class="h-[100%] w-[100%] mx-auto p-8 rounded-3xl bg-gray-200"></div>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'dayGridMonth',
-          height: '100%',  // IMPORTANT: Makes calendar fill container height
+          height: '100%',
+          eventDisplay: 'block',
+          eventColor: '#1BB1E6',
           headerToolbar: {
             left: 'prev,next today',
             center: 'title',
@@ -35,7 +37,16 @@
               duration: { weeks: 1 }
             }
           },
-          events: "event_filler", 
+          events: {
+            url: "/events/event_filler", 
+            method: 'GET'
+          },
+          eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            meridiem: false,
+            hour12: false
+          },
         });
         calendar.render();
       });
