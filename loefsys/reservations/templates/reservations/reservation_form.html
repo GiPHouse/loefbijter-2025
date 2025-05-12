@@ -72,7 +72,7 @@ Bewerk reservering
     </section>
 
     <section id="submit reservation" class="bg-[#1BB1E6] flex flex-col p-8 pb-30">
-        <h1 class="text-5xl font-bold"> RESERVERING INDIENEN </h1>
+        <h1 class="text-5xl font-bold">RESERVERING INDIENEN</h1>
         <form method="post" class="w-4/5 mx-auto">
             {% csrf_token %}
             <button type="submit" form="reservationform"
@@ -82,7 +82,7 @@ Bewerk reservering
         </form>
         <a href="{% url 'reservations' %}"
            class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-gray-200 hover:bg-gray-400 block text-center">
-            <span class="font-bold text-3xl"> Anuleer </span>
+            <span class="font-bold text-3xl">Annuleer</span>
         </a>
     </section>
 
