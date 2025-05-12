@@ -6,6 +6,8 @@ from django.forms import ValidationError
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from loefsys.reservations.models.boat import Boat
+from loefsys.reservations.models.choices import ReservableCategories
 from loefsys.reservations.models.reservable import ReservableItem
 from loefsys.users.models.user import User
 from loefsys.users.models.user_skippership import UserSkippership
@@ -86,11 +88,6 @@ class Reservation(models.Model):
             #     name="member_or_group",
             #     violation_error_message="Only a group or a member can make reservation, not both.",  # noqa: E501
             # ),  # TODO create tests for this
-            # CheckConstraint(
-            #     condition=,
-            #     name="authorized_skipper",
-            #     violation_error_message=""
-            # ),
         )
 
     def __str__(self) -> str:
@@ -101,12 +98,15 @@ class Reservation(models.Model):
         return reverse("reservation-detail", kwargs={"pk": self.pk})
 
     def clean(self):
-        """Check whether any of the other reservations overlap.
+        """Check whether any of the other reservations overlapand if the boat requires a skippership.
 
         Raises
         ------
             ValidationError: This item has already been reserved during this timeslot.
-        """
+            ValidationError: This item is not reservable at the moment.
+            ValidationError: The boat selected requires a skippership to be set.
+            ValidationError: The skippership set is not valid for this boat.
+        """  # noqa: E501
         try:
             Reservation.objects.get(
                 ~Q(pk=self.pk)
@@ -123,4 +123,19 @@ class Reservation(models.Model):
         except Reservation.DoesNotExist:
             if not self.reserved_item.is_reservable:
                 raise ValidationError("This item is not reservable at the moment.")
+
+            if self.reserved_item.reservable_type.category == ReservableCategories.BOAT:
+                skippership = Boat.objects.get(
+                    pk=self.reserved_item.pk
+                ).requires_skippership
+                if skippership:
+                    if not self.authorized_skipper:
+                        raise ValidationError(
+                            "The boat selected requires a skippership to be set."
+                        )
+
+                    if skippership != self.authorized_skipper.skippership:
+                        raise ValidationError(
+                            "The skippership set is not valid for this boat."
+                        )
             return
