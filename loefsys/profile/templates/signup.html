@@ -5,6 +5,84 @@ Aanmeld pagina
 {% endblock %}
 
 {% block content %}
+<div class="flex flex-col h-screen">
+  <!-- Main Content -->
+
+    <section class="bg-[#234193] p-8 flex flex-col items-center justify-center min-h-screen">
+      <h1 class="text-6xl font-bold text-white pb-8 mt-4">Aanmelden</h1>
+      <form method="post" class="bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
+        {% csrf_token %}
+        <!-- Username Field -->
+        {% comment %} <div class="mb-4">
+          <label for="{{ form.username.id_for_label }}" class="block text-left text-lg font-semibold mb-1">Gebruikersnaam</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+          {% endif %}
+        </div> {% endcomment %}
+        <!-- Email Field -->
+        <div class="mb-4">
+          <label for="{{ form.email.id_for_label }}" class="block text-left text-lg font-semibold mb-1">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</p>
+          {% endif %}
+        </div>
+        <!-- Password Field -->
+        <div class="mb-4">
+          <label for="{{ form.password1.id_for_label }}" class"block text-left text-lg font-semibold mb-1">Wachtwoord</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.password1.errors.0 }}</p>
+          {% endif %}
+        </div>
+        <!-- Confirm Password Field -->
+        <div class="mb-6">
+          <label for="{{ form.password2.id_for_label }}" class"block text-left text-lg font-semibold mb-1">Bevestig wachtwoord</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.password2.errors.0 }}</p>
+          {% endif %}
+        </div>
+        <!-- Non-field Errors -->
+        {% if form.non_field_errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.non_field_errors.0 }}</p>
+        {% endif %}
+        
+      </form>
+      <!-- Login Button -->
+      
+    </section>
+    <section class="bg-[#1BB1E6] flex-auto p-8">
+        <button type="submit" class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-gray-200 hover:bg-gray-400 block text-center">
+            <span class ="font-bold text-3xl">
+                Meld je aan
+            </span>
+        </button>
+
+        <a href="{% url 'login' %}" class="btn btn-primary p-2 font-bold border-2 rounded-3xl shadow-lg mx-auto my-3 w-4/5 bg-gray-200 hover:bg-gray-400 block text-center">
+            <span class="font-bold text-3xl">
+            Inloggen
+            </span>
+        </a>
+    </section>
+
+
+  <!-- Footer / Navigation Menu -->
+  {% include "menu.html" %}
+</div>
+{% endblock %}
+
+
+
+
+{% comment %} {% extends "base.html" %}
+
+{% block title %}
+Aanmeld pagina
+{% endblock %}
+
+{% block content %}
 
     <form method="post">
     {% csrf_token %}
@@ -12,4 +90,4 @@ Aanmeld pagina
     <button type="submit">Meld je aan</button>
     </form>
 
-{% endblock %}
+{% endblock %} {% endcomment %}

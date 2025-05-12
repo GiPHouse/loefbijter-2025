@@ -121,7 +121,7 @@ class LoginTestCase(TestCase):
         }
         response = self.client.post(reverse("signup"), data=form_data, follow=True)
         self.assertContains(response,
-                            "The two password fields didn't match.")
+                            "The two password fields didn’t match.")  # noqa: RUF001
 
     def test_signup(self):
         """Test for when a valid signup is performed, a user is created."""
