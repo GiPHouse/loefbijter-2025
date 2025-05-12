@@ -1,10 +1,12 @@
 """Module defining the views for events."""
 
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import DetailView, FormView
 
 from .exceptions import RegistrationError
@@ -179,3 +181,29 @@ class RegistrationFormView(FormView):
             return super().dispatch(request, *args, **kwargs)
 
         return redirect(self.success_url)
+
+class CalendarView(DetailView):
+
+    def get(self, request):
+        """Return the calendar view."""
+        return render(request, "events/calendar.html")
+
+
+class EventFillerView(View):
+    """View for the event filler."""
+
+    def get(self, request):
+        """Get the events for the calendar."""
+        events = Event.objects.all()
+        data = []
+        for event in events:
+            if event.published:
+                data.append(
+                    {
+                        "title": event.title,
+                        "start": event.start,
+                        "end": event.end,
+                        "url": event.get_absolute_url()
+                    }
+                )
+        return JsonResponse(data, safe=False)
