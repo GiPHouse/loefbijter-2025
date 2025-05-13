@@ -69,6 +69,11 @@
                     document.getElementById("fine-consent-checkbox").type="checkbox"
                 }
             </script>
+            {% if event.has_form_fields %}
+            <a href="{% url 'events:registration' slug=event.slug %}">
+                <button>Wijzig formulier</button>
+            </a>
+            {% endif %}
         </div>
         {% else %}
         <div class="border p-4 rounded-xl bg-gray-100 justify-center mt-4">
