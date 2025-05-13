@@ -20,7 +20,10 @@ class EventFieldsForm(forms.Form):
                 case RegistrationFormField.INTEGER_FIELD:
                     self.fields[key] = forms.IntegerField(required=field["required"])
                 case RegistrationFormField.DATETIME_FIELD:
-                    self.fields[key] = forms.DateTimeField(required=field["required"])
+                    self.fields[key] = forms.DateTimeField(
+                        required=field["required"],
+                        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+                    )
                 case _:  # RegistrationFormField.TEXT_FIELD
                     self.fields[key] = forms.CharField(
                         required=field["required"],
@@ -36,7 +39,9 @@ class EventFieldsForm(forms.Form):
 
             self.fields[key].label = field["subject"]
             self.fields[key].help_text = field["description"]
-            self.fields[key].initial = field["default"]
+            self.fields[key].initial = (
+                field["value"] if field["value"] else field["default"]
+            )
 
     def field_values(self):
         """Get field values."""
