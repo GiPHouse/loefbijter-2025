@@ -3,6 +3,8 @@
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.db.models import Q
+
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -28,6 +30,9 @@ class EventView(DetailView):
         The template needs these variables to render the correct page.
         (E.g. whether to render the registration or cancellation button.)
         """
+        if not self.get_object().published:
+            raise Http404("Not found")
+
         context = super().get_context_data(**kwargs)
         context["registration_active"] = (
             self.get_registrations_for_current_user().count() > 0
@@ -161,7 +166,7 @@ class RegistrationFormView(FormView):
         return kwargs
 
     def form_valid(self, form):
-        """Check if form is valid."""
+        """Handle valid form."""
         values = form.field_values()
         registration = self.__get_registration(self.event, self.request.user)
 

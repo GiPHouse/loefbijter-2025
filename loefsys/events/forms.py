@@ -12,14 +12,18 @@ class EventFieldsForm(forms.Form):
         self.form_fields = kwargs.pop("form_fields")
         super().__init__(*args, **kwargs)
 
-        for key, field in self.form_fields:
+        for k, field in self.form_fields:
+            key = str(k)
             match field["type"]:
                 case RegistrationFormField.BOOLEAN_FIELD:
                     self.fields[key] = forms.BooleanField(required=False)
                 case RegistrationFormField.INTEGER_FIELD:
                     self.fields[key] = forms.IntegerField(required=field["required"])
                 case RegistrationFormField.DATETIME_FIELD:
-                    self.fields[key] = forms.DateTimeField(required=field["required"])
+                    self.fields[key] = forms.DateTimeField(
+                        required=field["required"],
+                        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+                    )
                 case _:  # RegistrationFormField.TEXT_FIELD
                     self.fields[key] = forms.CharField(
                         required=field["required"],
@@ -35,7 +39,9 @@ class EventFieldsForm(forms.Form):
 
             self.fields[key].label = field["subject"]
             self.fields[key].help_text = field["description"]
-            self.fields[key].initial = field["default"]
+            self.fields[key].initial = (
+                field["value"] if field["value"] else field["default"]
+            )
 
     def field_values(self):
         """Get field values."""
@@ -43,4 +49,4 @@ class EventFieldsForm(forms.Form):
         print("cleaned_data", self.cleaned_data)
         for pk, field in self.form_fields:
             registration_form_field = RegistrationFormField.objects.get(id=pk)
-            yield pk, self.data.get(str(pk), registration_form_field.default)
+            yield pk, self.cleaned_data.get(str(pk), registration_form_field.default)

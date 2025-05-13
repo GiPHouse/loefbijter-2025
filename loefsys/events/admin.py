@@ -22,7 +22,7 @@ class RegistrationFormInline(admin.TabularInline):
     """Inline admin interface for registration form fields."""
 
     model = RegistrationFormField
-    extra = 1
+    extra = 0
 
 
 class EventOrganizerInline(admin.TabularInline):
