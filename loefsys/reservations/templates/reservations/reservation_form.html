@@ -52,9 +52,9 @@ Bewerk reservering
                 </div>
             </div>
 
-            <div class="flex flex-wrap gap-4 justify-center w-3/5 mx-auto mt-4">
+            <div class="grid-cols-1 w-3/5 justify-self-center mt-4">
                 {% for item in form.reserved_item.field.queryset %}
-                    <div class="w-full"> 
+                    <div class="text-3xl font-medium text-gray-900 flex" role="group">
                         <input type="radio"
                             value="{{ item.pk }}"
                             name="{{ form.reserved_item.name }}"
@@ -62,9 +62,38 @@ Bewerk reservering
                             class="peer hidden" required>
 
                         <label for="reserved_item_{{ forloop.counter }}"
-                            class="text-3xl font-medium text-gray-900 flex items-center border-6 {% if item.is_reservable %} border-green-600 {% else %} border-red-600 {% endif %} bg-white rounded-3xl w-full p-4 mb-4 peer-checked:bg-gray-400">
+                            class="w-full p-4 mb-4 text-left border-4 border-black rounded-s-3xl shadow-lg bg-white peer-checked:bg-gray-400">
                             {{ item.name }}
                         </label>
+
+                        <a onClick="(function() { alert('test') })()" class="btn btn-primary {% if item.is_reservable %} border-green-600 {% else %} border-red-600 {% endif %} p-4 mb-4 border-4 shadow-lg bg-white hover:bg-gray-200">
+                            <span>
+                                Beschikbaarheid
+                            </span>
+                        </a>
+
+                        <details class="open">
+                            <summary class="p-4 mb-4 border-4 border-black rounded-e-3xl shadow-lg bg-white hover:bg-gray-200">
+                                Info
+                            </summary>
+                            <div class="p-4 py-8 bg-white inset-0 rounded-2xl w-1/2 h-2/5 border-4 border-black my-auto mx-auto fixed">
+                                <span onclick="document.querySelector('details').removeAttribute('open')"
+                                    class="bg-[#1BB1E6] rounded-full flex items-center justify-center font-bold uppercase absolute -right-4 -top-4 w-10 h-10 text-white hover:bg-blue-300">
+                                    X
+                                </span>
+                                <h1 class="text-[#234193] font-bold">
+                                    {{ item.name }}
+                                </h1>
+
+                                <p class="text-2xl my-3">
+                                    {{ item.description }}
+                                </p>
+                                <p class="text-base my-3">
+                                    Locatie: {{ item.get_location_display }}
+                                </p>
+                            </div>
+                        </details>
+
                     </div>
                 {% endfor %}
             </div>
