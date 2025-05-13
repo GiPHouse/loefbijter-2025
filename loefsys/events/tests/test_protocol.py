@@ -1,6 +1,6 @@
 """Module defining the tests for the registration protocol."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -12,6 +12,7 @@ from loefsys.events.models.choices import EventCategories
 from loefsys.events.models.registration import RegistrationStatus
 from loefsys.events.models.registration_form_field import (
     BooleanRegistrationInformation,
+    DatetimeRegistrationInformation,
     IntegerRegistrationInformation,
     TextRegistrationInformation,
 )
@@ -127,6 +128,40 @@ class EventRegistrationTestCase(TestCase):
             description="This is an integer field.",
             required=False,
         )
+        self.form_field_datetime = G(
+            RegistrationFormField,
+            event=self.upcoming_event_with_form_fields,
+            type=RegistrationFormField.DATETIME_FIELD,
+            subject="Datetime",
+            description="This is a datetime field.",
+            required=False,
+        )
+        self.upcoming_event_with_required_form_fields = G(
+            Event,
+            title="Upcoming event",
+            description="Event for which you can sign up right now.",
+            start=now + timedelta(days=7),
+            end=now + timedelta(days=8),
+            registration_start=now - timedelta(days=1),
+            registration_deadline=now + timedelta(days=6),
+            cancelation_deadline=now + timedelta(days=6),
+            category=EventCategories.LEISURE,
+            capacity=30,
+            price=0.00,
+            fine=0.00,
+            location="The Netherlands",
+            is_open_event=True,
+            published=True,
+            send_cancel_email=False,
+        )
+        self.form_field_required_text = G(
+            RegistrationFormField,
+            event=self.upcoming_event_with_required_form_fields,
+            type=RegistrationFormField.TEXT_FIELD,
+            subject="Text",
+            description="This is a required text field.",
+            required=True,
+        )
         self.upcoming_event_for_1_person = G(
             Event,
             title="Upcoming event for 1 person",
@@ -192,7 +227,7 @@ class EventRegistrationTestCase(TestCase):
         response = self.client.get(self.upcoming_event.get_absolute_url())
         self.assertContains(response=response, text="Je bent ingeschreven")
 
-    def test_registration_form(self):
+    def test_registration_form_simple(self):
         """Test for when a user registers for an event and fills in the form.
 
         When a user registers for an event, and fills in the form,
@@ -230,6 +265,23 @@ class EventRegistrationTestCase(TestCase):
         )
 
         # Submit the event registration form
+        text_field_pk = RegistrationFormField.objects.get(
+            event=self.upcoming_event_with_form_fields,
+            type=RegistrationFormField.TEXT_FIELD,
+        ).pk
+        boolean_field_pk = RegistrationFormField.objects.get(
+            event=self.upcoming_event_with_form_fields,
+            type=RegistrationFormField.BOOLEAN_FIELD,
+        ).pk
+        integer_field_pk = RegistrationFormField.objects.get(
+            event=self.upcoming_event_with_form_fields,
+            type=RegistrationFormField.INTEGER_FIELD,
+        ).pk
+        datetime_field_pk = RegistrationFormField.objects.get(
+            event=self.upcoming_event_with_form_fields,
+            type=RegistrationFormField.DATETIME_FIELD,
+        ).pk
+        print(text_field_pk, boolean_field_pk, integer_field_pk, datetime_field_pk)
         response = self.client.post(
             reverse(
                 "events:registration",
@@ -237,9 +289,10 @@ class EventRegistrationTestCase(TestCase):
             ),
             data={
                 "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
-                "1": "Hello",
-                "2": "on",
-                "3": "3",
+                str(text_field_pk): "Hello",
+                str(boolean_field_pk): "on",
+                str(integer_field_pk): "3",
+                str(datetime_field_pk): "2025-05-13T12:00",
             },
         )
 
@@ -285,8 +338,140 @@ class EventRegistrationTestCase(TestCase):
             .value,
         )
 
+        self.assertEqual(
+            timezone.make_aware(
+                datetime.strptime("2025-05-13T12:00", "%Y-%m-%dT%H:%M")
+            ),
+            DatetimeRegistrationInformation.objects.filter(
+                registration=EventRegistration.objects.filter(
+                    event=self.upcoming_event_with_form_fields,
+                    contact=self.user1,
+                    status=RegistrationStatus.ACTIVE,
+                ).first(),
+                field=self.form_field_datetime,
+            )
+            .first()
+            .value,
+        )
+
         response = self.client.get(
             self.upcoming_event_with_form_fields.get_absolute_url()
+        )
+        self.assertContains(response=response, text="Je bent ingeschreven")
+
+    def test_registration_form_required_fields_accept_complete(self):
+        """Test for when a user registers and fills in the form with required fields.
+
+        When a user registers for an event, and fills in the form with required fields,
+        an event registration should be added to the database and the form
+        submission should be taken into account.
+        """
+        self.client.force_login(user=self.user1)
+
+        response = self.client.get(
+            self.upcoming_event_with_required_form_fields.get_absolute_url()
+        )
+        self.assertNotContains(response=response, text="Je bent ingeschreven")
+
+        # Register for event
+        response = self.client.post(
+            reverse(
+                "events:event",
+                kwargs={"pk": self.upcoming_event_with_required_form_fields.pk},
+            ),
+            data={
+                "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
+                "action": "register",
+            },
+        )
+
+        # Submit the event registration form
+        required_text_field_pk = RegistrationFormField.objects.get(
+            event=self.upcoming_event_with_required_form_fields,
+            type=RegistrationFormField.TEXT_FIELD,
+        ).pk
+        response = self.client.post(
+            reverse(
+                "events:registration",
+                kwargs={"slug": self.upcoming_event_with_required_form_fields.slug},
+            ),
+            data={
+                "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
+                str(required_text_field_pk): "Hello",
+            },
+        )
+
+        self.assertEqual(
+            "Hello",
+            TextRegistrationInformation.objects.filter(
+                registration=EventRegistration.objects.filter(
+                    event=self.upcoming_event_with_required_form_fields,
+                    contact=self.user1,
+                    status=RegistrationStatus.ACTIVE,
+                ).first(),
+                field=self.form_field_required_text,
+            )
+            .first()
+            .value,
+        )
+
+        response = self.client.get(
+            self.upcoming_event_with_required_form_fields.get_absolute_url()
+        )
+        self.assertContains(response=response, text="Je bent ingeschreven")
+
+    def test_registration_form_required_fields_reject_incomplete(self):
+        """Test for when a user registers and fills in the form with required fields.
+
+        When a user registers for an event, and submits the form with required fields,
+        without filling in the required fields (e.g. via a manual POST request),
+        bypassing the client-side validation, then an event registration should still be
+        added to the database but the form submission should not be taken into account.
+        """
+        self.client.force_login(user=self.user1)
+
+        self.assertTrue(
+            self.upcoming_event_with_required_form_fields.eventregistration_set.count()
+            == 0
+        )
+
+        response = self.client.get(
+            self.upcoming_event_with_required_form_fields.get_absolute_url()
+        )
+        self.assertNotContains(response=response, text="Je bent ingeschreven")
+
+        # Register for event
+        response = self.client.post(
+            reverse(
+                "events:event",
+                kwargs={"pk": self.upcoming_event_with_required_form_fields.pk},
+            ),
+            data={
+                "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
+                "action": "register",
+            },
+        )
+
+        # Submit the event registration form
+        required_text_field_pk = RegistrationFormField.objects.filter(
+            event=self.upcoming_event_with_required_form_fields,
+            type=RegistrationFormField.TEXT_FIELD,
+        )
+        response = self.client.post(
+            reverse(
+                "events:registration",
+                kwargs={"slug": self.upcoming_event_with_required_form_fields.slug},
+            ),
+            data={
+                "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
+                str(required_text_field_pk): "",
+            },
+        )
+
+        self.assertTrue(TextRegistrationInformation.objects.all().count() == 0)
+
+        response = self.client.get(
+            self.upcoming_event_with_required_form_fields.get_absolute_url()
         )
         self.assertContains(response=response, text="Je bent ingeschreven")
 
