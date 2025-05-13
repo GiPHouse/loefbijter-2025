@@ -26,7 +26,11 @@ In order to contribute to the project, you should have the following prerequisit
     $ uv run pre-commit install
 
 #. In the root directory, make a ``.env`` file and fill it with the necessary environment variables. In :ref:`recommended-env`, the recommended environment variables for development can be found.
-#. Finally, you can start the development server with::
+#. Install Tailwind CLI and execute the following command::
+
+    $ tailwindcss -i loefsys/indexpage/static/input.css -o loefsys/indexpage/static/output.css --watch
+
+#. Finally, you can start the development server in a new terminal with::
 
     $ uv run manage.py runserver
 

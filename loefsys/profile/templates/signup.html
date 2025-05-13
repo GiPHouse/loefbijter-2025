@@ -1,13 +1,16 @@
-<!DOCTYPE html>
-<html>
-<header>Sign up page:</header>
+{% extends "base.html" %}
 
-<body>
-    <form action="/signup/" method="post">
-        {% csrf_token %}
-        {{ form }}
+{% block title %}
+Sign up page
+{% endblock %}
 
-        <input type="submit" value="Sign up">
-    </form>
-</body>
-</html>
+{% block content %}
+
+<form action="/signup/" method="post">
+    {% csrf_token %}
+    {{ form }}
+
+    <input type="submit" value="Sign up">
+</form>
+
+{% endblock %}

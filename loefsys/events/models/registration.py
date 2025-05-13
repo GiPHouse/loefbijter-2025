@@ -4,8 +4,8 @@ from decimal import Decimal
 from typing import Any
 
 from django.contrib.auth import get_user_model
-from django.db import models
-from django.db.models import Case, F, When
+from django.db import models, transaction
+from django.db.models import Case, F, Q, When
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
@@ -68,13 +68,19 @@ class EventRegistration(TimeStampedModel):
         db_persist=True,
     )
     costs_paid = models.DecimalField(
-        max_digits=5, decimal_places=2, verbose_name=_("Costs paid")
+        max_digits=5, decimal_places=2, verbose_name=_("Costs paid"), blank=True
     )
+
+    @property
+    def form_fields(self):
+        """Get form fields and their values on the registration form."""
+        fields = self.event.registrationformfield_set.all()
+        return [(field, field.get_value_for(self)) for field in fields]
 
     objects = EventRegistrationManager()
 
     class Meta:
-        unique_together = ("event", "contact")
+        unique_together = ("event", "contact", "status")
 
     def __str__(self) -> str:
         return f"{self.event} | {self.contact}"
@@ -92,7 +98,7 @@ class EventRegistration(TimeStampedModel):
         if self._state.adding:
             self.status = (
                 RegistrationStatus.QUEUED
-                if self.event.max_capacity_reached()
+                if self.event.max_capacity_reached() and self.event.capacity
                 else RegistrationStatus.ACTIVE
             )
             self.price_at_registration = self.event.price
@@ -121,16 +127,30 @@ class EventRegistration(TimeStampedModel):
         Afterwards, the event is notified to potentially activate a registration in the
         queue.
         """
+        print("CANCELLATION STARTED")
+
         if self.status in {
             RegistrationStatus.CANCELLED_FINE,
             RegistrationStatus.CANCELLED_NOFINE,
         }:
             return
 
-        self.status = (
-            RegistrationStatus.CANCELLED_FINE
-            if self.event.fine_on_cancellation()
-            and self.status == RegistrationStatus.ACTIVE
-            else RegistrationStatus.CANCELLED_NOFINE
-        )
-        self.event.process_cancellation()
+        with transaction.atomic():
+            # Set status to cancelled
+            self.status = (
+                RegistrationStatus.CANCELLED_FINE
+                if self.event.fine_on_cancellation()
+                and self.status == RegistrationStatus.ACTIVE
+                else RegistrationStatus.CANCELLED_NOFINE
+            )
+
+            # Remove old cancelled registrations
+            EventRegistration.objects.filter(
+                contact=self.contact, event=self.event
+            ).filter(
+                Q(status=RegistrationStatus.CANCELLED_FINE)
+                | Q(status=RegistrationStatus.CANCELLED_NOFINE)
+            ).delete()
+
+            self.save()
+            self.event.process_cancellation()

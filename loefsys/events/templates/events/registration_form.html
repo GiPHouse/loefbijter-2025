@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Inschrijven
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-screen">
+    <section id="event-details" class="bg-[#234193] p-8 flex flex-col">
+        <h1 class="text-6xl font-bold text-white pb-8 mt-4"> Inschrijven</h1>
+    </section>
+    <section id="event-detail" class="bg-[#1BB1E6] flex-auto p-8">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="border p-4 rounded-xl bg-gray-100 justify-center mt-4">
+                    <label class="font-bold text-3xl">{{ field.label }}</label>
+
+                    {% if field.help_text %}
+                        <small class="form-text text-muted block mb-2 text-xl">{{ field.help_text }}</small>
+                    {% endif %}
+
+                    <div class="border border-gray-400 rounded-md p-2 bg-white">
+                        {{ field }}
+                    </div>
+
+                    {% for error in field.errors %}
+                        <p style="color: red">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <input type="submit" class="btn btn-primary border p-4 rounded-xl bg-gray-100 justify-center mt-4" value="Submit">
+        </form>
+    </section>
+</div>
+{% endblock %}

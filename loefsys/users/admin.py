@@ -23,6 +23,7 @@ class UserAdmin(BaseUserAdmin):
                     "last_name",
                     "is_active",
                     "phone_number",
+                    "picture",
                     "note",
                 )
             },
