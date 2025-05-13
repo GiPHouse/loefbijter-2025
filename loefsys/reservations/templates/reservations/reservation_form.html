@@ -72,12 +72,12 @@ Bewerk reservering
                             </span>
                         </a>
 
-                        <details class="open">
+                        <details class="open" name="open">
                             <summary class="p-4 mb-4 border-4 border-black rounded-e-3xl shadow-lg bg-white hover:bg-gray-200">
                                 Info
                             </summary>
                             <div class="p-4 py-8 bg-white inset-0 rounded-2xl w-1/2 h-2/5 border-4 border-black my-auto mx-auto fixed">
-                                <span onclick="document.querySelector('details').removeAttribute('open')"
+                                <span onclick="this.closest('details').removeAttribute('open')"
                                     class="bg-[#1BB1E6] rounded-full flex items-center justify-center font-bold uppercase absolute -right-4 -top-4 w-10 h-10 text-white hover:bg-blue-300">
                                     X
                                 </span>
