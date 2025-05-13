@@ -2,9 +2,9 @@
 
 from django.urls import path
 
-from . import views
+from .views import AccountinfoView, AccountinfoeditView
 
 urlpatterns = [
-    path("", views.accountinfo, name="accountinfo"),
-    path("edit", views.accountinfoedit, name="accountinfoedit"),
+    path("", AccountinfoView.as_view(), name="accountinfo"),
+    path("edit", AccountinfoeditView.as_view(), name="accountinfoedit"),
 ]
