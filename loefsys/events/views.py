@@ -159,7 +159,7 @@ class RegistrationFormView(FormView):
         return kwargs
 
     def form_valid(self, form):
-        """Check if form is valid."""
+        """Handle valid form."""
         values = form.field_values()
         registration = self.__get_registration(self.event, self.request.user)
 
