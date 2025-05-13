@@ -29,7 +29,7 @@ class ReservationListView(LoginRequiredMixin, ListView):
                 case "location":
                     filters = "reserved_item__location"
                 case "A-Z":
-                    filters = Lower("reserved_item")
+                    filters = Lower("reserved_item__name")
                 case "type":
                     filters = "reserved_item__reservable_type"
                 case _:

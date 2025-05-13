@@ -98,7 +98,7 @@ class Reservation(models.Model):
         return reverse("reservation-detail", kwargs={"pk": self.pk})
 
     def clean(self):
-        """Check whether any of the other reservations overlapand if the boat requires a skippership.
+        """Check whether any of the other reservations overlap and if the boat requires a skippership.
 
         Raises
         ------
