@@ -88,9 +88,6 @@ class RegistrationFormField(models.Model):
         """Set value for registration form field based on registration and value."""
         value_set = self.__get_field_set()
 
-        if self.type == self.BOOLEAN_FIELD:
-            value = True if value == "on" else False
-
         try:
             field_value = value_set.get(registration=registration)
         except BooleanRegistrationInformation.DoesNotExist:

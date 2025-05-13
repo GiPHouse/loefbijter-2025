@@ -12,7 +12,8 @@ class EventFieldsForm(forms.Form):
         self.form_fields = kwargs.pop("form_fields")
         super().__init__(*args, **kwargs)
 
-        for key, field in self.form_fields:
+        for k, field in self.form_fields:
+            key = str(k)
             match field["type"]:
                 case RegistrationFormField.BOOLEAN_FIELD:
                     self.fields[key] = forms.BooleanField(required=False)
@@ -43,4 +44,4 @@ class EventFieldsForm(forms.Form):
         print("cleaned_data", self.cleaned_data)
         for pk, field in self.form_fields:
             registration_form_field = RegistrationFormField.objects.get(id=pk)
-            yield pk, self.data.get(str(pk), registration_form_field.default)
+            yield pk, self.cleaned_data.get(str(pk), registration_form_field.default)
