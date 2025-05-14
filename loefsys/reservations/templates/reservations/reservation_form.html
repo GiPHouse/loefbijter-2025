@@ -5,35 +5,110 @@
 {% endblock %}
 
 {% block content %}
-<div class="flex flex-col h-screen">
-    <section class="bg-[#234193] p-8 flex flex-col">
-        <form id="reservationform" method="post" class="bg-white p-8 rounded-3xl shadow-lg w-4/5 mx-auto space-y-6 text-left">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
+<div class="bg-[#1BB1E6] relative flex flex-col h-screen ">
+    <section class="bg-[#234193] p-8 w-full">
+        <h1 class="text-5xl font-bold text-white">RESERVEREN</h1>
+        <div class="flex justify-center items-center">
+            <ul class="flex flex-wrap text-4xl font-medium text-center text-gray-500 dark:text-gray-400">
+                <li class="me-2">
+                    <a href="{% url 'reservation-add' '1' %}"
+                       class="uppercase inline-block px-4 py-3 {% if location == 1 %}text-white active" {% endif %}
+                       aria-current="page">Board Room</a>
+                </li>
+                <li class="me-2">
+                    <a href="{% url 'reservation-add' '2' %}"
+                       class="uppercase inline-block px-4 py-3 {% if location == 2 %}text-white active" {% endif %}
+                       aria-current="page">Bastion</a>
+                </li>
+                <li class="me-2">
+                    <a href="{% url 'reservation-add' '3' %}"
+                       class="uppercase inline-block px-4 py-3 {% if location == 3 %}text-white active" {% endif %}
+                       aria-current="page">Kraaij</a>
+                </li>
+            </ul>
+        </div>
 
-            {% for field in form %}
-                <div>
-                    <label for="{{ field.id_for_label }}" class="block text-2xl font-bold mb-2">
-                        {{ field.label }}:
-                    </label>
-                    <div class="text-xl">{{ field }}</div>
-                    {% if field.help_text %}
-                        <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+        <form id="reservationform" method="post">
+            {% csrf_token %}
+            <div class="text-red-600">
+                {{ form.non_field_errors }}
+            </div>
+            <div class="bg-white p-4 rounded-3xl border-4 border-black shadow-lg w-4/5 mx-auto text-left">
+                <div class="flex flex-wrap gap-4 justify-center">
+                    {% for field in form %}
+                    {% if field.name != 'reserved_item' %}
+                        <div class="flex flex-col items-center text-center min-w-[200px] space-y-2">
+                            <label for="{{ field.id_for_label }}" class="text-3xl font-bold">
+                                {{ field.label }}:
+                            </label>
+                            <div class="text-3xl font-bold w-full">{{ field }}</div>
+                            {% if field.help_text %}
+                            <p class="text-sm text-gray-500 font-medium">{{ field.help_text }}</p>
+                            {% endif %}
+                            {% for error in field.errors %}
+                            <p class="text-red-600 text-sm font-semibold">{{ error }}</p>
+                            {% endfor %}
+                        </div>
                     {% endif %}
-                    {% for error in field.errors %}
-                        <p class="text-red-600 text-sm">{{ error }}</p>
                     {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
+
+            <div class="grid-cols-1 w-3/5 justify-self-center mt-4">
+                {% for item in form.reserved_item.field.queryset %}
+                    <div class="text-3xl font-medium text-gray-900 flex" role="group">
+                        <input type="radio"
+                            value="{{ item.pk }}"
+                            name="{{ form.reserved_item.name }}"
+                            id="reserved_item_{{ forloop.counter }}"
+                            class="peer hidden" required>
+
+                        <label for="reserved_item_{{ forloop.counter }}"
+                            class="w-full p-4 mb-4 text-left border-4 border-black rounded-s-3xl shadow-lg bg-white peer-checked:bg-gray-400">
+                            {{ item.name }}
+                        </label>
+
+                        <div class="border-black {% if item.is_reservable %} bg-green-600 {% else %} bg-red-600 {% endif %} p-4 mb-4 border-4 shadow-lg ">
+                            <span>
+                                {% if item.is_reservable %} Beschikbaar {% else %} Niet Beschikbaar {% endif %}
+                            </span>
+                        </div>
+
+                        <details class="open" name="open">
+                            <summary class="p-4 mb-4 border-4 border-black rounded-e-3xl shadow-lg bg-white hover:bg-gray-200">
+                                Info
+                            </summary>
+                            <div class="p-4 py-8 bg-white inset-0 rounded-2xl w-1/2 h-2/5 border-4 border-black my-auto mx-auto fixed">
+                                <span onclick="this.closest('details').removeAttribute('open')"
+                                    class="bg-[#1BB1E6] rounded-full flex items-center justify-center font-bold uppercase absolute -right-4 -top-4 w-10 h-10 text-white hover:bg-blue-300">
+                                    X
+                                </span>
+                                <h1 class="text-[#234193] font-bold">
+                                    {{ item.name }}
+                                </h1>
+
+                                <p class="text-2xl my-3">
+                                    {{ item.description }}
+                                </p>
+                                <p class="text-base my-3">
+                                    Locatie: {{ item.get_location_display }}
+                                </p>
+                            </div>
+                        </details>
+
+                    </div>
+                {% endfor %}
+            </div>
+
         </form>
     </section>
 
-    <!-- Submit or Cancel -->
-    <section id="submit reservation" class="bg-[#1BB1E6] flex-auto p-8">
-        <h1 class="text-5xl font-bold">RESERVERING INDIENEN </h1>
+    <section id="submit reservation" class="bg-[#1BB1E6] flex flex-col p-8 pb-30">
+        <h1 class="text-5xl font-bold">RESERVERING INDIENEN</h1>
         <form method="post" class="w-4/5 mx-auto">
             {% csrf_token %}
-            <button type="submit" form="reservationform" class="btn btn-primary p-2 border-2 rounded-3xl shadow-lg w-full bg-gray-200 hover:bg-gray-400 block text-center">
+            <button type="submit" form="reservationform"
+                    class="btn btn-primary p-2 border-2 rounded-3xl shadow-lg w-full bg-gray-200 hover:bg-gray-400 block text-center">
                 <span class="font-bold text-3xl">Reservering Indienen</span>
             </button>
         </form>
@@ -41,5 +116,9 @@
             <span class="font-bold text-3xl">Annuleer</span>
         </a>
     </section>
-    {% include "menu.html" %}
+
+
+    <div class="fixed bottom-0 w-full">
+        {% include "menu.html" %}
+    </div>
 {% endblock %}

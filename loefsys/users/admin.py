@@ -5,6 +5,8 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext as _
 
 from .models import User
+from .models.skippership import Skippership
+from .models.user_skippership import UserSkippership
 
 
 @admin.register(User)
@@ -49,3 +51,8 @@ class UserAdmin(BaseUserAdmin):
         if not obj:
             return self.add_fieldsets
         return super().get_fieldsets(request, obj)
+
+
+@admin.register(Skippership, UserSkippership)
+class SkippershipAdmin(admin.ModelAdmin):
+    """Admin class for the Skippership models."""

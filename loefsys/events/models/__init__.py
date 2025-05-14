@@ -2,6 +2,6 @@
 
 from .event import Event, EventOrganizer
 from .registration import EventRegistration
-from .registration_form_field import RegistrationFormField, RegistrationFormFieldResponse
+from .registration_form_field import RegistrationFormField
 
-__all__ = ["Event", "EventOrganizer", "EventRegistration", "RegistrationFormField", "RegistrationFormFieldResponse"]
+__all__ = ["Event", "EventOrganizer", "EventRegistration", "RegistrationFormField"]

@@ -8,7 +8,9 @@ from .models import ReservableItem, Reservation
 class CreateReservationForm(forms.ModelForm):
     """A form to create reservations."""
 
-    reserved_item = forms.ModelChoiceField(queryset=ReservableItem.objects.all())
+    reserved_item = forms.ModelChoiceField(
+        queryset=ReservableItem.objects.none(), widget=forms.RadioSelect
+    )
     start = forms.DateTimeField(
         input_formats=["%I:%M %p %d-%b-%Y"],
         widget=forms.DateTimeInput(
@@ -25,3 +27,17 @@ class CreateReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
         fields = ("reserved_item", "start", "end")
+
+
+class FilterReservationForm(forms.Form):
+    """A form to filter reservations."""
+
+    CHOICES = (
+        ("start", "Starttijd"),
+        ("end", "Eindtijd"),
+        ("location", "Locatie"),
+        ("-date_of_creation", "Nieuwste eerst"),
+        ("A-Z", "A-Z"),
+        ("type", "Type"),
+    )
+    filters = forms.ChoiceField(choices=CHOICES, required=False)

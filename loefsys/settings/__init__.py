@@ -18,7 +18,7 @@ from .auth import AuthSettings
 # from .security import SecuritySettings
 from .admin import AdminSettings
 from .database import DatabaseSettings
-# from .locale import LocaleSettings
+from .locale import LocaleSettings
 # from .logging import LoggingSettings
 # from .storage import StorageSettings
 # isort: on
@@ -36,7 +36,7 @@ load_dotenv()
 class Settings(
     DatabaseSettings,
     StorageSettings,
-    # LocaleSettings,
+    LocaleSettings,
     AdminSettings,
     # SecuritySettings,
     AuthSettings,

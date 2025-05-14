@@ -6,8 +6,11 @@ from django.forms import ValidationError
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+# from loefsys.reservations.models.boat import Boat
+# from loefsys.reservations.models.choices import ReservableCategories
 from loefsys.reservations.models.reservable import ReservableItem
 from loefsys.users.models.user import User
+from loefsys.users.models.user_skippership import UserSkippership
 
 
 class Reservation(models.Model):
@@ -51,8 +54,9 @@ class Reservation(models.Model):
     # TODO reservee_user is a temporary field which should be replaced
     # by the fields reservee_member and reservee_group once the WebCie
     # has added Member(ship) to the admin page.
+    # TODO Add a constraint to check whether the skipper has the correct skipperships.
     authorized_skipper = models.ForeignKey(
-        User,
+        UserSkippership,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -61,6 +65,7 @@ class Reservation(models.Model):
 
     start = models.DateTimeField(verbose_name=_("Start time"))
     end = models.DateTimeField(verbose_name=_("End time"))
+    date_of_creation = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = (
@@ -93,12 +98,15 @@ class Reservation(models.Model):
         return reverse("reservation-detail", kwargs={"pk": self.pk})
 
     def clean(self):
-        """Check whether any of the other reservations overlap.
+        """Check whether any of the other reservations overlap and if the boat requires a skippership.
 
         Raises
         ------
             ValidationError: This item has already been reserved during this timeslot.
-        """
+            ValidationError: This item is not reservable at the moment.
+            ValidationError: The boat selected requires a skippership to be set.
+            ValidationError: The skippership set is not valid for this boat.
+        """  # noqa: E501
         try:
             Reservation.objects.get(
                 ~Q(pk=self.pk)
@@ -115,4 +123,20 @@ class Reservation(models.Model):
         except Reservation.DoesNotExist:
             if not self.reserved_item.is_reservable:
                 raise ValidationError("This item is not reservable at the moment.")
+
+            # TODO Add a field to the frontend in the ReservationCreateView to support skipperships.  # noqa: E501
+            # if self.reserved_item.reservable_type.category == ReservableCategories.BOAT:  # noqa: E501
+            #     requires_skippership = Boat.objects.get(
+            #         pk=self.reserved_item.pk
+            #     ).requires_skippership
+            #     if requires_skippership:
+            #         if not self.authorized_skipper:
+            #             raise ValidationError(
+            #                 "The boat selected requires a skippership to be set."
+            #             )
+
+            #         if requires_skippership != self.authorized_skipper.skippership:
+            #             raise ValidationError(
+            #                 "The skippership set is not valid for this boat."
+            #             )
             return

@@ -55,6 +55,7 @@ class ProfileSignupView(FormView):
 #     subject_template_name = "reset_password_subject.txt"  # the email subject line 
 #     success_url = "/profile/password-reset/done/"
 
+
 class ProfilePasswordResetView(PasswordResetView):
     """View for requesting password reset."""
 
@@ -62,7 +63,6 @@ class ProfilePasswordResetView(PasswordResetView):
     email_template_name = "reset_password_email.html"  # email body
     subject_template_name = "reset_password_subject.txt"  # email subject line 
     success_url = "/profile/password-reset/done/"
-
 
 
 class ProfilePasswordResetDoneView(PasswordResetDoneView):
@@ -82,3 +82,16 @@ class ProfilePasswordResetConfirmView(PasswordResetConfirmView):
 
     template_name = "password_reset_confirm.html"
     success_url = "/profile/password-reset/complete/"
+
+    
+class SignupFormView(FormView):
+    """Sign up page view."""
+
+    template_name = "signup.html"
+    form_class = SignupForm
+    success_url = "/"
+
+    def form_valid(self, form):
+        """Save the new user and log them in after a successful registration."""
+        form.save()
+        return super().form_valid(form)
