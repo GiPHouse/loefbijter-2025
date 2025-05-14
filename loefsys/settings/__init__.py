@@ -12,7 +12,7 @@ from .storage import StorageSettings
 # isort: off
 from .test import TestSettings
 from .templates import TemplateSettings
-# from .email import EmailSettings
+from .email import EmailSettings
 from .base import BaseSettings
 from .auth import AuthSettings
 # from .security import SecuritySettings
@@ -40,7 +40,7 @@ class Settings(
     AdminSettings,
     # SecuritySettings,
     AuthSettings,
-    # EmailSettings,
+    EmailSettings,
     # LoggingSettings,
     TemplateSettings,
     BaseSettings,

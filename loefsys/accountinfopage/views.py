@@ -4,7 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views.generic import View
 
-from loefsys.users.models import MemberDetails, Membership
+from loefsys.users.models import MemberDetails
+from loefsys.users.models.membership import Membership
 
 from . import forms
 
@@ -13,7 +14,7 @@ class AccountinfoView(LoginRequiredMixin, View):
     """Account information view."""
 
     template_name = "accountinfopage.html"
-    login_url = "signup_page"
+    login_url = "signup"
 
     def get_account_info(self):
         """Get account information from the user."""
@@ -24,7 +25,6 @@ class AccountinfoView(LoginRequiredMixin, View):
             "picture": self.request.user.picture,
             "groups": self.request.user.groups.all(),
         }
-
         member_info = []
         qs_member = MemberDetails.objects.filter(user=self.request.user)
         if qs_member.count() == 1:
@@ -57,7 +57,7 @@ class AccountinfoeditView(LoginRequiredMixin, View):
     """Account information edit view."""
 
     template_name = "accountinfoeditpage.html"
-    login_url = "signup_page"
+    login_url = "signup"
 
     def get(self, request):
         """Handle the get request for the edit account information form."""
@@ -77,6 +77,7 @@ class AccountinfoeditView(LoginRequiredMixin, View):
     def post(self, request):
         """Handle the post request for the edit account information form."""
         old_picture = self.request.user.picture
+
         user_form = forms.EditUserInfo(
             request.POST, request.FILES, instance=self.request.user
         )
