@@ -12,7 +12,7 @@ from .views import (
 
 urlpatterns = [
     path("", ReservationListView.as_view(), name="reservations"),
-    path("add/", ReservationCreateView.as_view(), name="reservation-add"),
+    path("add/<int:location>", ReservationCreateView.as_view(), name="reservation-add"),
     path("update/<int:pk>", ReservationUpdateView.as_view(), name="reservation-update"),
     path("delete/<int:pk>", ReservationDeleteView.as_view(), name="reservation-delete"),
     path("detail/<int:pk>", ReservationDetailView.as_view(), name="reservation-detail"),
