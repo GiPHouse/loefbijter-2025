@@ -30,7 +30,9 @@
 
         <form id="reservationform" method="post">
             {% csrf_token %}
-            {{ form.non_field_errors }}
+            <div class="text-red-600">
+                {{ form.non_field_errors }}
+            </div>
             <div class="bg-white p-4 rounded-3xl border-4 border-black shadow-lg w-4/5 mx-auto text-left">
                 <div class="flex flex-wrap gap-4 justify-center">
                     {% for field in form %}
@@ -66,11 +68,11 @@
                             {{ item.name }}
                         </label>
 
-                        <a onClick="(function() { alert('test') })()" class="btn btn-primary {% if item.is_reservable %} border-green-600 {% else %} border-red-600 {% endif %} p-4 mb-4 border-4 shadow-lg bg-white hover:bg-gray-200">
+                        <div class="border-black {% if item.is_reservable %} bg-green-600 {% else %} bg-red-600 {% endif %} p-4 mb-4 border-4 shadow-lg ">
                             <span>
-                                Beschikbaarheid
+                                {% if item.is_reservable %} Beschikbaar {% else %} Niet Beschikbaar {% endif %}
                             </span>
-                        </a>
+                        </div>
 
                         <details class="open" name="open">
                             <summary class="p-4 mb-4 border-4 border-black rounded-e-3xl shadow-lg bg-white hover:bg-gray-200">
